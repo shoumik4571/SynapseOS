@@ -8,7 +8,7 @@ echo "🧠 Starting SynapseOS (Nebius x NVIDIA Hackathon 2026)..."
 
 # 1. Start Python Backend
 echo "⚡ Launching FastAPI Backend on http://localhost:8000..."
-./backend/venv/bin/python -m app.main &
+(cd backend && ./venv/bin/python -m app.main) &
 BACKEND_PID=$!
 
 # 2. Start Frontend
