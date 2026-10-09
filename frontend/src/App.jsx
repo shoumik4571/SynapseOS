@@ -94,8 +94,8 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
-        {/* Navigation Tabs */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+        {/* Navigation Tabs - Sticky */}
+        <div className="sticky top-[60px] bg-slate-950/95 backdrop-blur-md z-30 pt-1 pb-3 flex items-center justify-between border-b border-slate-800/80">
           <div className="flex items-center gap-2">
             {[
               { id: 'briefing', label: 'Executive Briefing', icon: Target },
@@ -148,6 +148,7 @@ export default function App() {
                 fetchBriefing();
                 fetchStats();
               }}
+              onUpdateMetrics={(m) => setMetrics(m)}
             />
           )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Sparkles, CheckCircle2, Clock, AlertCircle, ChevronRight, Plus, Calendar, Flag } from 'lucide-react';
 
-export default function GoalPlannerView({ onGoalCreated }) {
+export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
   const [goalText, setGoalText] = useState('');
   const [targetDate, setTargetDate] = useState('2026-10-30');
   const [loading, setLoading] = useState(false);
@@ -42,6 +42,9 @@ export default function GoalPlannerView({ onGoalCreated }) {
       });
       const data = await res.json();
       setCurrentDecomposition(data.decomposition);
+      if (data.metrics?.tokens_per_second) {
+        onUpdateMetrics?.(data.metrics);
+      }
       setGoalText('');
       fetchGoals();
       onGoalCreated?.();
