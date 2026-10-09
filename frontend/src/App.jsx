@@ -8,7 +8,7 @@ import QuickCaptureModal from './components/QuickCaptureModal';
 import GoalPlannerView from './components/GoalPlannerView';
 import SettingsModal from './components/SettingsModal';
 import AmbientDrawer from './components/AmbientDrawer';
-import MagnifyingNav from './components/MagnifyingNav';
+import MacDockNav from './components/MacDockNav';
 import BenchmarkView from './components/BenchmarkView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, MessageSquare, ArrowLeftRight, Database, Compass, Gauge } from 'lucide-react';
@@ -97,8 +97,8 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
-        {/* Magnifying Navigation Dock */}
-        <MagnifyingNav
+        {/* Authentic macOS Dock Navigation */}
+        <MacDockNav
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           isDemoMode={isDemoMode}
