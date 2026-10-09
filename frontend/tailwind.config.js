@@ -7,6 +7,11 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        display: ['Syne', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Hanken Grotesk"', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+      },
       colors: {
         obsidian: {
           950: "#030014", // Deep void cosmos black

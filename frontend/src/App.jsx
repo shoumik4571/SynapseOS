@@ -9,6 +9,8 @@ import GoalPlannerView from './components/GoalPlannerView';
 import SettingsModal from './components/SettingsModal';
 import AmbientDrawer from './components/AmbientDrawer';
 import MacDockNav from './components/MacDockNav';
+import StudioMarquee from './components/StudioMarquee';
+import StudioHero from './components/StudioHero';
 import BenchmarkView from './components/BenchmarkView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, MessageSquare, ArrowLeftRight, Database, Compass, Gauge } from 'lucide-react';
@@ -95,8 +97,17 @@ export default function App() {
         isDemoMode={isDemoMode}
       />
 
+      {/* Studio-Inspired Infinite Discipline Marquee */}
+      <StudioMarquee />
+
       {/* Main Container */}
-      <main className="flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
+      <main className="flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-8">
+        {/* Studio-Inspired Editorial Hero & Stats Matrix */}
+        <StudioHero
+          metrics={metrics}
+          onExploreTab={(tab) => setActiveTab(tab)}
+        />
+
         {/* Authentic macOS Dock Navigation */}
         <MacDockNav
           activeTab={activeTab}
