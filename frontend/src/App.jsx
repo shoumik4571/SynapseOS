@@ -5,7 +5,10 @@ import ContextDiffView from './components/ContextDiffView';
 import CopilotChat from './components/CopilotChat';
 import MemoryInspector from './components/MemoryInspector';
 import QuickCaptureModal from './components/QuickCaptureModal';
-import { Target, MessageSquare, ArrowLeftRight, Database } from 'lucide-react';
+import GoalPlannerView from './components/GoalPlannerView';
+import SettingsModal from './components/SettingsModal';
+import AmbientDrawer from './components/AmbientDrawer';
+import { Target, MessageSquare, ArrowLeftRight, Database, Compass } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('briefing');
@@ -14,6 +17,9 @@ export default function App() {
   const [briefing, setBriefing] = useState(null);
   const [loadingBriefing, setLoadingBriefing] = useState(false);
   const [isCaptureOpen, setIsCaptureOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('nebius_api_key') || '');
 
   // Keyboard shortcut for Cmd+K
   useEffect(() => {
@@ -82,6 +88,8 @@ export default function App() {
         metrics={metrics}
         stats={stats}
         onOpenCapture={() => setIsCaptureOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        isDemoMode={isDemoMode}
       />
 
       {/* Main Container */}
@@ -91,6 +99,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             {[
               { id: 'briefing', label: 'Executive Briefing', icon: Target },
+              { id: 'goals', label: 'Goal Engine', icon: Compass },
               { id: 'chat', label: 'Thought Partner', icon: MessageSquare },
               { id: 'diff', label: 'Context Switch Diff', icon: ArrowLeftRight },
               { id: 'memory', label: 'Memory & Watcher', icon: Database },
@@ -114,8 +123,12 @@ export default function App() {
             })}
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-mono">
-            <span>Hackathon 2026: Personal AI Track</span>
+          <div className="hidden sm:flex items-center gap-3 text-xs text-slate-500 font-mono">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400">
+              <span className={`w-1.5 h-1.5 rounded-full ${isDemoMode ? 'bg-nebius-cyan' : 'bg-nvidia-green'}`} />
+              <span>{isDemoMode ? "Interactive Demo" : "Nebius Live"}</span>
+            </span>
+            <span className="hidden md:inline">Track 2: Personal AI</span>
           </div>
         </div>
 
@@ -126,6 +139,15 @@ export default function App() {
               briefing={briefing}
               onRegenerate={regenerateBriefing}
               loading={loadingBriefing}
+            />
+          )}
+
+          {activeTab === 'goals' && (
+            <GoalPlannerView
+              onGoalCreated={() => {
+                fetchBriefing();
+                fetchStats();
+              }}
             />
           )}
 
@@ -152,6 +174,26 @@ export default function App() {
         onCaptured={() => {
           fetchStats();
         }}
+      />
+
+      {/* Settings & BYOK Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        apiKey={apiKey}
+        onSaveKey={(newKey) => {
+          setApiKey(newKey);
+          localStorage.setItem('nebius_api_key', newKey);
+        }}
+        isDemoMode={isDemoMode}
+        onToggleDemo={(val) => setIsDemoMode(val)}
+      />
+
+      {/* Ambient Slide-In Edge HUD (Hover or Cmd+Shift+S) */}
+      <AmbientDrawer
+        briefing={briefing}
+        metrics={metrics}
+        onCapture={fetchStats}
       />
     </div>
   );

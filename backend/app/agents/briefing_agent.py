@@ -34,15 +34,21 @@ Do NOT output markdown backticks or any conversational preamble. Return pure JSO
 
 class BriefingAgent:
     async def generate_briefing(self) -> Dict[str, Any]:
-        """Gathers recent memory context and prompts Nemotron via Nebius Token Factory."""
-        recent_items = memory_store.get_recent_items(limit=15)
+        """Gathers recent memory context, active goals, and prompts Nemotron via Nebius Token Factory."""
+        recent_items = memory_store.get_recent_items(limit=12)
+        active_goals = memory_store.get_goals(status="active")
         
         context_snippets = []
         for item in recent_items:
-            snippet = f"[{item['item_type'].upper()}: {item['title']}]\n{item['sanitized_content'][:500]}"
+            snippet = f"[{item['item_type'].upper()}: {item['title']}]\n{item['sanitized_content'][:400]}"
             context_snippets.append(snippet)
 
-        joined_context = "\n\n".join(context_snippets) if context_snippets else "No recent workspace items recorded yet. Today is day 1 of the new project."
+        goals_block = ""
+        if active_goals:
+            goals_list = [f"- {g['title']} (Target: {g.get('target_date', 'N/A')})" for g in active_goals]
+            goals_block = "USER'S ACTIVE HIGH-LEVEL GOALS:\n" + "\n".join(goals_list) + "\n\n"
+
+        joined_context = goals_block + ("\n\n".join(context_snippets) if context_snippets else "No recent workspace items recorded yet. Day 1.")
 
         user_prompt = f"""Current Date & Time: {datetime.now().strftime('%Y-%m-%d %H:%M')}
 

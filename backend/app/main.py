@@ -20,6 +20,8 @@ from app.nebius_client import nebius_client
 from app.agents.briefing_agent import briefing_agent
 from app.agents.context_diff_agent import context_diff_agent
 from app.agents.copilot_agent import copilot_agent
+from app.agents.goal_agent import goal_agent
+import httpx
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -58,6 +60,14 @@ class ContextDiffRequest(BaseModel):
 class ChatStreamRequest(BaseModel):
     session_id: str = "default-session"
     message: str
+
+class GoalDecomposeRequest(BaseModel):
+    goal: str
+    target_date: Optional[str] = ""
+
+class VerifyKeyRequest(BaseModel):
+    api_key: str
+    base_url: Optional[str] = "https://api.tokenfactory.nebius.com/v1/"
 
 # Endpoints
 @app.get("/api/health")
@@ -126,6 +136,46 @@ async def chat_stream(req: ChatStreamRequest):
 @app.get("/api/chat/history/{session_id}")
 async def get_chat_history(session_id: str, limit: int = 30):
     return memory_store.get_chat_history(session_id=session_id, limit=limit)
+
+@app.post("/api/goals/decompose")
+async def decompose_goal(req: GoalDecomposeRequest):
+    if not req.goal.strip():
+        raise HTTPException(status_code=400, detail="Goal cannot be empty.")
+    return await goal_agent.decompose_goal(goal_input=req.goal, target_date=req.target_date)
+
+@app.get("/api/goals")
+async def list_goals(status: str = "active"):
+    return memory_store.get_goals(status=status)
+
+@app.post("/api/goals/{goal_id}/status")
+async def update_goal_status(goal_id: int, status: str = Query("completed")):
+    memory_store.update_goal_status(goal_id=goal_id, status=status)
+    return {"status": "updated", "goal_id": goal_id, "new_status": status}
+
+@app.post("/api/settings/verify-key")
+async def verify_nebius_key(req: VerifyKeyRequest):
+    """Pings Nebius Token Factory live to verify that an API key is valid."""
+    url = req.base_url.rstrip("/") + "/models"
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            resp = await client.get(url, headers={"Authorization": f"Bearer {req.api_key.strip()}"})
+            if resp.status_code == 200:
+                data = resp.json()
+                models = [m.get("id") for m in data.get("data", [])]
+                nemotron_models = [m for m in models if "nemotron" in m.lower()]
+                return {
+                    "valid": True,
+                    "provider": "Nebius Token Factory",
+                    "nemotron_models": nemotron_models,
+                    "total_models": len(models)
+                }
+            else:
+                return {
+                    "valid": False,
+                    "error": f"Nebius returned status code {resp.status_code}: {resp.text[:100]}"
+                }
+    except Exception as e:
+        return {"valid": False, "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

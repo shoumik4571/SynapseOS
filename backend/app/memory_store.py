@@ -67,6 +67,19 @@ class MemoryStore:
                     created_at REAL NOT NULL
                 )
             """)
+
+            # High-level goals & autonomous decompositions
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS goals (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    target_date TEXT,
+                    status TEXT DEFAULT 'active', -- 'active', 'completed', 'paused'
+                    decomposition_json TEXT DEFAULT '{}',
+                    created_at REAL NOT NULL,
+                    updated_at REAL NOT NULL
+                )
+            """)
             conn.commit()
 
     def add_context_item(self, item_type: str, title: str, content: str, metadata: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -238,11 +251,57 @@ class MemoryStore:
             cursor.execute("SELECT COUNT(*) FROM chat_history")
             total_chats = cursor.fetchone()[0]
 
+            cursor.execute("SELECT COUNT(*) FROM goals WHERE status = 'active'")
+            active_goals = cursor.fetchone()[0]
+
         return {
             "total_items": total_items,
             "by_type": by_type,
             "total_redactions": total_redactions,
-            "total_chats": total_chats
+            "total_chats": total_chats,
+            "active_goals": active_goals,
         }
+
+    def save_goal(self, title: str, decomposition: Dict[str, Any], target_date: str = "", goal_id: Optional[int] = None) -> int:
+        now = time.time()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if goal_id:
+                cursor.execute("""
+                    UPDATE goals
+                    SET title = ?, decomposition_json = ?, target_date = ?, updated_at = ?
+                    WHERE id = ?
+                """, (title, json.dumps(decomposition), target_date, now, goal_id))
+                conn.commit()
+                return goal_id
+            else:
+                cursor.execute("""
+                    INSERT INTO goals (title, target_date, status, decomposition_json, created_at, updated_at)
+                    VALUES (?, ?, 'active', ?, ?, ?)
+                """, (title, target_date, json.dumps(decomposition), now, now))
+                conn.commit()
+                return cursor.lastrowid
+
+    def get_goals(self, status: str = "active") -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM goals WHERE status = ? ORDER BY created_at DESC", (status,))
+            rows = cursor.fetchall()
+
+        return [{
+            "id": r["id"],
+            "title": r["title"],
+            "target_date": r["target_date"],
+            "status": r["status"],
+            "decomposition": json.loads(r["decomposition_json"] or "{}"),
+            "created_at": r["created_at"],
+            "updated_at": r["updated_at"]
+        } for r in rows]
+
+    def update_goal_status(self, goal_id: int, status: str):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE goals SET status = ?, updated_at = ? WHERE id = ?", (status, time.time(), goal_id))
+            conn.commit()
 
 memory_store = MemoryStore()

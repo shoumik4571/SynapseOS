@@ -1,7 +1,7 @@
 import React from 'react';
-import { Cpu, Zap, Shield, Plus, Command } from 'lucide-react';
+import { Cpu, Zap, Shield, Plus, Command, Settings } from 'lucide-react';
 
-export default function Header({ metrics, stats, onOpenCapture }) {
+export default function Header({ metrics, stats, onOpenCapture, onOpenSettings, isDemoMode }) {
   return (
     <header className="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40 px-6 py-3 flex items-center justify-between">
       {/* Brand & Track */}
@@ -72,6 +72,15 @@ export default function Header({ metrics, stats, onOpenCapture }) {
           <span className="hidden sm:inline-flex items-center gap-0.5 text-[10px] bg-slate-950/20 px-1.5 py-0.5 rounded">
             <Command className="w-2.5 h-2.5" /> K
           </span>
+        </button>
+
+        {/* Settings / BYOK Button */}
+        <button
+          onClick={onOpenSettings}
+          title="Settings & API Key Providers"
+          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-colors"
+        >
+          <Settings className="w-4 h-4" />
         </button>
       </div>
     </header>
