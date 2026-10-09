@@ -4,52 +4,26 @@
 
 @layer base {
   body {
-    background-color: #030014;
-    color: #f3f4f6;
+    background-color: #000000;
+    color: #ededed;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     overflow-x: hidden;
   }
 }
 
-/* Custom Purple/Obsidian Scrollbars */
+/* Minimalist Dark Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #030014;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #241852;
+  background: #262626;
   border-radius: 9999px;
-  border: 1px solid rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #7c3aed;
-}
-
-/* Glassmorphism Classes */
-.glass-panel {
-  background: rgba(13, 8, 36, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(168, 85, 247, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(3, 0, 20, 0.45);
-}
-
-.glass-panel-glow {
-  background: rgba(18, 13, 46, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  box-shadow: 0 0 40px -10px rgba(168, 85, 247, 0.25);
-}
-
-/* Neon Glow utilities */
-.glow-text-purple {
-  text-shadow: 0 0 15px rgba(168, 85, 247, 0.5), 0 0 30px rgba(139, 92, 246, 0.3);
-}
-
-.glow-box-purple {
-  box-shadow: 0 0 25px -5px rgba(168, 85, 247, 0.35);
+  background: #404040;
 }

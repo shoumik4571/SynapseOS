@@ -8,7 +8,7 @@ import QuickCaptureModal from './components/QuickCaptureModal';
 import GoalPlannerView from './components/GoalPlannerView';
 import SettingsModal from './components/SettingsModal';
 import AmbientDrawer from './components/AmbientDrawer';
-import Synapse3DScene from './components/Synapse3DScene';
+import MagnifyingNav from './components/MagnifyingNav';
 import BenchmarkView from './components/BenchmarkView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, MessageSquare, ArrowLeftRight, Database, Compass, Gauge } from 'lucide-react';
@@ -85,61 +85,24 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-obsidian-950 text-slate-100 flex flex-col font-sans overflow-x-hidden selection:bg-purple-600 selection:text-white">
-      {/* 3D WebGL Neural Core & Nebula Cosmic Particles */}
-      <Synapse3DScene />
-
+    <div className="relative min-h-screen bg-black text-neutral-100 flex flex-col font-sans overflow-x-hidden selection:bg-white selection:text-black">
       {/* Top Header with live Nebius Telemetry */}
-      <div className="relative z-10">
-        <Header
-          metrics={metrics}
-          stats={stats}
-          onOpenCapture={() => setIsCaptureOpen(true)}
-          onOpenSettings={() => setIsSettingsOpen(true)}
-          isDemoMode={isDemoMode}
-        />
-      </div>
+      <Header
+        metrics={metrics}
+        stats={stats}
+        onOpenCapture={() => setIsCaptureOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        isDemoMode={isDemoMode}
+      />
 
       {/* Main Container */}
-      <main className="relative z-10 flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
-        {/* Navigation Tabs - Clean, Minimalist Bar */}
-        <div className="sticky top-[56px] bg-[#07050f]/80 backdrop-blur-xl z-30 pt-1 pb-3 flex items-center justify-between border-b border-white/[0.08]">
-          <div className="flex items-center gap-1">
-            {[
-              { id: 'briefing', label: 'Executive Briefing', icon: Target },
-              { id: 'goals', label: 'Goal Engine', icon: Compass },
-              { id: 'chat', label: 'Thought Partner', icon: MessageSquare },
-              { id: 'benchmark', label: 'H100 Speed Benchmark', icon: Gauge },
-              { id: 'diff', label: 'Context Switch Diff', icon: ArrowLeftRight },
-              { id: 'memory', label: 'Memory & Watcher', icon: Database },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    isActive
-                      ? 'bg-purple-950/60 text-white border border-purple-500/30'
-                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-400' : 'text-zinc-500'}`} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="hidden sm:flex items-center gap-3 text-xs text-zinc-500 font-mono">
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0d091a] border border-white/[0.08] text-zinc-400">
-              <span className={`w-1.5 h-1.5 rounded-full ${isDemoMode ? 'bg-nebius-cyan' : 'bg-nvidia-green'}`} />
-              <span>{isDemoMode ? "Interactive Demo" : "Nebius Live"}</span>
-            </span>
-            <span className="hidden md:inline text-zinc-600">Track 2: Personal AI</span>
-          </div>
-        </div>
+      <main className="flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
+        {/* Magnifying Navigation Dock */}
+        <MagnifyingNav
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+          isDemoMode={isDemoMode}
+        />
 
         {/* Tab Content with Fluid Motion Transitions */}
         <div className="flex-1">

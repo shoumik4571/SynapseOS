@@ -5,14 +5,12 @@ import {
   Cpu, 
   Gauge, 
   Server, 
-  TrendingUp, 
   CheckCircle2, 
   RefreshCw, 
   Flame, 
   ShieldCheck, 
   BarChart3,
-  Sparkles,
-  ArrowRight
+  Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -33,10 +31,10 @@ export default function BenchmarkView({ onUpdateMetrics }) {
           onUpdateMetrics(data.live_metrics);
         }
         confetti({
-          particleCount: 50,
-          spread: 70,
+          particleCount: 40,
+          spread: 60,
           origin: { y: 0.6 },
-          colors: ['#A855F7', '#C084FC', '#00E5FF', '#76B900']
+          colors: ['#FFFFFF', '#A855F7', '#10B981']
         });
       } else {
         setError(data.error || 'Benchmark run failed');
@@ -57,238 +55,243 @@ export default function BenchmarkView({ onUpdateMetrics }) {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner: Telemetry Hero in Purple & Obsidian Black */}
-      <div className="relative overflow-hidden rounded-3xl border border-purple-500/30 bg-gradient-to-br from-obsidian-900/90 via-purple-950/35 to-obsidian-950 p-7 backdrop-blur-2xl shadow-[0_0_60px_-15px_rgba(168,85,247,0.25)]">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/15 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-nebius-cyan/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300 text-xs font-mono font-medium shadow-sm">
-              <Flame className="w-3.5 h-3.5 text-synapse-purple animate-pulse" />
-              <span>NVIDIA Nemotron-3.5-Lightning on Nebius Token Factory</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
-              <span className="bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent">
-                H100 Telemetry & Speed Benchmark
-              </span>
-              <Sparkles className="w-5 h-5 text-purple-400" />
-            </h1>
-            <p className="text-sm text-purple-200/70 max-w-2xl leading-relaxed">
-              Empirical hardware telemetry demonstrating why SynapseOS delivers zero ambient friction:
-              sustained <strong className="text-white">165+ tokens/sec</strong> on dedicated NVIDIA H100 clusters vs traditional cloud API bottlenecks.
-            </p>
+      {/* Top Banner: Telemetry Hero with Hover Magnification */}
+      <motion.div 
+        whileHover={{ scale: 1.012, y: -2 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 rounded-2xl bg-neutral-950 border border-neutral-800 shadow-xl"
+      >
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-mono font-medium text-neutral-300">
+            <Flame className="w-3.5 h-3.5 text-white" />
+            <span>NVIDIA Nemotron-3.5 on Nebius Token Factory</span>
           </div>
-
-          <button
-            onClick={runBenchmark}
-            disabled={loading}
-            className={`flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 shadow-xl ${
-              loading
-                ? 'bg-obsidian-900 text-purple-400/50 cursor-not-allowed border border-purple-500/20'
-                : 'bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/40 hover:shadow-purple-600/60 border border-purple-400/40 active:scale-95'
-            }`}
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>{loading ? 'Benchmarking Nebius H100...' : 'Run Live Benchmark'}</span>
-          </button>
+          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+            H100 Speed Benchmark & Telemetry
+            <Sparkles className="w-4 h-4 text-white" />
+          </h1>
+          <p className="text-xs text-neutral-400 max-w-2xl leading-relaxed">
+            Live hardware telemetry demonstrating why SynapseOS delivers zero ambient friction:
+            sustained <strong className="text-white">165+ tokens/sec</strong> on dedicated NVIDIA H100 clusters vs traditional cloud bottlenecks.
+          </p>
         </div>
-      </div>
 
-      {/* Main Metrics 3-Card Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Metric 1: Sustained Throughput */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 backdrop-blur-xl relative overflow-hidden shadow-lg shadow-purple-950/40 hover:border-purple-400/50 transition-all duration-300"
+        {/* Crisp White Action Button */}
+        <motion.button
+          onClick={runBenchmark}
+          disabled={loading}
+          whileHover={{ scale: 1.06, y: -1 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: "spring", stiffness: 450, damping: 20 }}
+          className="flex items-center justify-center gap-2.5 px-5 py-3 rounded-xl bg-white text-black hover:bg-neutral-200 font-semibold text-xs shadow-md shadow-white/10 active:scale-95 disabled:opacity-50 transition-colors flex-shrink-0"
         >
-          <div className="flex items-center justify-between text-purple-300/80 text-xs font-medium">
-            <span className="flex items-center gap-1.5 font-mono">
-              <Zap className="w-3.5 h-3.5 text-synapse-purple" />
-              SUSTAINED THROUGHPUT
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <span>{loading ? 'Benchmarking Nebius H100...' : 'Run Live Benchmark'}</span>
+        </motion.button>
+      </motion.div>
+
+      {/* Main Metrics 3-Card Grid with Hover Magnifications */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Metric 1 */}
+        <motion.div
+          whileHover={{ scale: 1.025, y: -3 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 shadow-lg"
+        >
+          <div className="flex items-center justify-between text-neutral-400 text-xs font-medium font-mono">
+            <span className="flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-white" />
+              THROUGHPUT
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono text-[10px] border border-purple-500/30">
+            <span className="px-2 py-0.5 rounded-full bg-neutral-900 text-neutral-300 text-[10px] border border-neutral-800">
               H100 SXM5
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-4xl font-extrabold font-mono text-white tracking-tight drop-shadow-[0_0_12px_rgba(168,85,247,0.5)]">
+            <span className="text-4xl font-extrabold font-mono text-white tracking-tight">
               {liveMetrics ? liveMetrics.tokens_per_second : '165.3'}
             </span>
-            <span className="text-sm font-bold text-synapse-purple font-mono">tok/s</span>
+            <span className="text-sm font-semibold text-neutral-400 font-mono">tok/s</span>
           </div>
-          <p className="mt-2.5 text-xs text-purple-200/60 leading-relaxed">
-            <strong className="text-purple-300">4.8x faster</strong> than standard cloud A100 endpoints. Powers zero-lag background briefings.
+          <p className="mt-2 text-xs text-neutral-500">
+            <strong className="text-white">4.8x faster</strong> than standard cloud A100 endpoints.
           </p>
         </motion.div>
 
-        {/* Metric 2: Time to First Token (TTFT) */}
+        {/* Metric 2 */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.08 }}
-          className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 backdrop-blur-xl relative overflow-hidden shadow-lg shadow-purple-950/40 hover:border-purple-400/50 transition-all duration-300"
+          whileHover={{ scale: 1.025, y: -3 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 shadow-lg"
         >
-          <div className="flex items-center justify-between text-purple-300/80 text-xs font-medium">
-            <span className="flex items-center gap-1.5 font-mono">
-              <Gauge className="w-3.5 h-3.5 text-nebius-cyan" />
-              TIME TO FIRST TOKEN (TTFT)
+          <div className="flex items-center justify-between text-neutral-400 text-xs font-medium font-mono">
+            <span className="flex items-center gap-1.5">
+              <Gauge className="w-3.5 h-3.5 text-white" />
+              TIME TO FIRST TOKEN
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-nebius-cyan/15 text-nebius-cyan font-mono text-[10px] border border-nebius-cyan/30">
+            <span className="px-2 py-0.5 rounded-full bg-neutral-900 text-neutral-300 text-[10px] border border-neutral-800">
               Low Latency
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-4xl font-extrabold font-mono text-white tracking-tight drop-shadow-[0_0_12px_rgba(0,229,255,0.4)]">
+            <span className="text-4xl font-extrabold font-mono text-white tracking-tight">
               {liveMetrics ? liveMetrics.ttft_ms : '1,719'}
             </span>
-            <span className="text-sm font-bold text-nebius-cyan font-mono">ms</span>
+            <span className="text-sm font-semibold text-neutral-400 font-mono">ms</span>
           </div>
-          <p className="mt-2.5 text-xs text-purple-200/60 leading-relaxed">
-            Includes deep reasoning verification on Nemotron before direct streaming token emission.
+          <p className="mt-2 text-xs text-neutral-500">
+            Includes deep reasoning verification before streaming.
           </p>
         </motion.div>
 
-        {/* Metric 3: Total Execution Runtime */}
+        {/* Metric 3 */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.16 }}
-          className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 backdrop-blur-xl relative overflow-hidden shadow-lg shadow-purple-950/40 hover:border-purple-400/50 transition-all duration-300"
+          whileHover={{ scale: 1.025, y: -3 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 shadow-lg"
         >
-          <div className="flex items-center justify-between text-purple-300/80 text-xs font-medium">
-            <span className="flex items-center gap-1.5 font-mono">
-              <Server className="w-3.5 h-3.5 text-pink-400" />
+          <div className="flex items-center justify-between text-neutral-400 text-xs font-medium font-mono">
+            <span className="flex items-center gap-1.5">
+              <Server className="w-3.5 h-3.5 text-white" />
               TOTAL TEST RUNTIME
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-pink-500/15 text-pink-300 font-mono text-[10px] border border-pink-500/30">
+            <span className="px-2 py-0.5 rounded-full bg-neutral-900 text-neutral-300 text-[10px] border border-neutral-800">
               150 Tokens
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-4xl font-extrabold font-mono text-white tracking-tight drop-shadow-[0_0_12px_rgba(244,114,182,0.4)]">
+            <span className="text-4xl font-extrabold font-mono text-white tracking-tight">
               {liveMetrics ? (liveMetrics.total_time_ms / 1000).toFixed(2) : '2.62'}
             </span>
-            <span className="text-sm font-bold text-pink-400 font-mono">sec</span>
+            <span className="text-sm font-semibold text-neutral-400 font-mono">sec</span>
           </div>
-          <p className="mt-2.5 text-xs text-purple-200/60 leading-relaxed">
-            Full executive synthesis produced in under 3 seconds. Instant background proactive notifications.
+          <p className="mt-2 text-xs text-neutral-500">
+            Full executive synthesis produced in under 3 seconds.
           </p>
         </motion.div>
       </div>
 
-      {/* Comparative Throughput Breakdown */}
-      <div className="p-7 rounded-3xl bg-obsidian-900/80 border border-purple-500/25 backdrop-blur-2xl space-y-6 shadow-xl shadow-purple-950/50">
+      {/* Comparisons Section with Hover Magnifications */}
+      <motion.div 
+        whileHover={{ scale: 1.008 }}
+        className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-5 shadow-xl"
+      >
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <BarChart3 className="w-5 h-5 text-synapse-purple" />
-            <h2 className="text-lg font-bold text-white tracking-tight">Hardware & Cloud Architecture Comparison</h2>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-white" />
+            <h2 className="text-lg font-bold text-white">Cloud Architecture Comparison</h2>
           </div>
-          <span className="text-xs font-mono text-purple-300/60">Tested under identical token workloads</span>
+          <span className="text-xs font-mono text-neutral-500">Tested under identical token workloads</span>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {comparisons.map((item, idx) => {
             const isChampion = item.is_current;
             const maxTps = 180;
             const barWidth = Math.min(100, Math.round((item.throughput_tps / maxTps) * 100));
 
             return (
-              <div 
+              <motion.div 
                 key={idx}
-                className={`p-5 rounded-2xl border transition-all duration-300 ${
+                whileHover={{ scale: 1.02, x: 3 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                className={`p-4 rounded-xl border transition-all ${
                   isChampion
-                    ? 'bg-gradient-to-r from-purple-950/50 via-obsidian-900 to-obsidian-950 border-purple-500/50 shadow-lg shadow-purple-950/70'
-                    : 'bg-obsidian-950/60 border-purple-500/15'
+                    ? 'bg-neutral-900 border-neutral-700 shadow-md'
+                    : 'bg-black border-neutral-850'
                 }`}
               >
-                <div className="flex items-center justify-between text-xs mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-bold text-white text-sm">{item.platform}</span>
-                    <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] border ${
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-white">{item.platform}</span>
+                    <span className={`px-2 py-0.5 rounded-full font-mono text-[10px] border ${
                       isChampion 
-                        ? 'bg-purple-500/25 text-purple-200 border-purple-400/50 font-bold'
-                        : 'bg-obsidian-900 text-purple-400/60 border-purple-500/20'
+                        ? 'bg-white text-black border-white font-bold'
+                        : 'bg-neutral-900 text-neutral-400 border-neutral-800'
                     }`}>
                       {item.badge}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-3.5 font-mono">
-                    <span className="text-purple-300/60">TTFT: <strong className="text-purple-200">{item.ttft_ms}ms</strong></span>
-                    <span className={`font-bold text-sm ${isChampion ? 'text-synapse-purple drop-shadow-[0_0_8px_rgba(168,85,247,0.7)]' : 'text-purple-300/50'}`}>
+                  <div className="flex items-center gap-3 font-mono">
+                    <span className="text-neutral-500">TTFT: <strong className="text-neutral-200">{item.ttft_ms}ms</strong></span>
+                    <span className={`font-bold ${isChampion ? 'text-white' : 'text-neutral-400'}`}>
                       {item.throughput_tps} tok/s
                     </span>
-                    <span className={`text-[11px] px-2.5 py-0.5 rounded-md font-bold ${
-                      isChampion ? 'bg-purple-500/30 text-purple-200 border border-purple-400/30' : 'bg-red-500/10 text-red-400'
+                    <span className={`text-[11px] px-2 py-0.5 rounded font-semibold ${
+                      isChampion ? 'bg-white/10 text-white' : 'bg-neutral-800 text-neutral-400'
                     }`}>
                       {item.acceleration}
                     </span>
                   </div>
                 </div>
 
-                {/* Animated Horizontal Bar */}
-                <div className="w-full bg-obsidian-950 rounded-full h-3 overflow-hidden border border-purple-500/20 p-0.5">
+                <div className="w-full bg-neutral-900 rounded-full h-2.5 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${barWidth}%` }}
-                    transition={{ duration: 0.9, ease: "easeOut" }}
-                    className={`h-full rounded-full ${
-                      isChampion
-                        ? 'bg-gradient-to-r from-purple-600 via-violet-500 to-nebius-cyan shadow-md shadow-purple-500/50'
-                        : 'bg-purple-900/40'
-                    }`}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className={`h-full rounded-full ${isChampion ? 'bg-white' : 'bg-neutral-700'}`}
                   />
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Why Nebius Token Factory for Personal AI */}
+      {/* Explainer Cards with Magnification */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 backdrop-blur-xl space-y-3 shadow-lg shadow-purple-950/40">
-          <div className="flex items-center gap-2 text-synapse-purple text-sm font-bold">
+        <motion.div 
+          whileHover={{ scale: 1.02, y: -2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="p-5 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2 shadow-md"
+        >
+          <div className="flex items-center gap-2 text-white text-sm font-semibold">
             <CheckCircle2 className="w-4 h-4" />
             <span>Zero Ambient Latency Friction</span>
           </div>
-          <p className="text-xs text-purple-200/70 leading-relaxed">
+          <p className="text-xs text-neutral-400 leading-relaxed">
             Personal copilots must act proactively in the background without stealing user focus. 
-            With Nebius Token Factory providing sustained <strong className="text-white">165 tokens/sec</strong>, 
-            morning briefings and 3-point context diffs generate invisibly before the user even touches their keyboard.
+            With Nebius Token Factory delivering sustained <strong className="text-white">165 tokens/sec</strong>, 
+            briefings and context reload diffs generate invisibly before you reach for your keyboard.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 backdrop-blur-xl space-y-3 shadow-lg shadow-purple-950/40">
-          <div className="flex items-center gap-2 text-nebius-cyan text-sm font-bold">
+        <motion.div 
+          whileHover={{ scale: 1.02, y: -2 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className="p-5 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2 shadow-md"
+        >
+          <div className="flex items-center gap-2 text-white text-sm font-semibold">
             <ShieldCheck className="w-4 h-4" />
             <span>Privacy Guardrail & Zero-Retention</span>
           </div>
-          <p className="text-xs text-purple-200/70 leading-relaxed">
-            SynapseOS pairs client-side NeMo semantic token scrubbing (zero API key or PII exposure) 
-            with Nebius enterprise zero-retention cloud inference, delivering privacy that matches on-device execution 
+          <p className="text-xs text-neutral-400 leading-relaxed">
+            SynapseOS pairs client-side NeMo semantic token scrubbing (zero credential exposure) 
+            with Nebius enterprise zero-retention cloud inference, matching on-device privacy 
             with 4.8x the throughput of an M3 laptop.
           </p>
-        </div>
+        </motion.div>
       </div>
 
       {/* Live Sample Output */}
       {liveMetrics?.response_text && (
-        <div className="p-6 rounded-3xl bg-obsidian-900/60 border border-purple-500/20 font-mono text-xs space-y-2.5 backdrop-blur-xl">
-          <div className="flex items-center justify-between text-purple-300/70 border-b border-purple-500/20 pb-2.5">
-            <span className="flex items-center gap-1.5 text-synapse-purple font-semibold">
+        <motion.div 
+          whileHover={{ scale: 1.01 }}
+          className="p-5 rounded-2xl bg-neutral-950 border border-neutral-800 font-mono text-xs space-y-2 shadow-md"
+        >
+          <div className="flex items-center justify-between text-neutral-400 border-b border-neutral-800 pb-2">
+            <span className="flex items-center gap-1.5 text-white">
               <Cpu className="w-3.5 h-3.5" />
               LIVE TELEMETRY PROMPT SYNTHESIS
             </span>
             <span>{liveMetrics.total_tokens} tokens stream-verified</span>
           </div>
-          <p className="text-purple-100/90 leading-relaxed whitespace-pre-wrap pt-1">
+          <p className="text-neutral-300 leading-relaxed whitespace-pre-wrap pt-1">
             {liveMetrics.response_text}
           </p>
-        </div>
+        </motion.div>
       )}
     </div>
   );

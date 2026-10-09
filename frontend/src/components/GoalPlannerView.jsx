@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Target, Sparkles, CheckCircle2, Clock, Calendar, ChevronRight, Layers, Flag } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -59,10 +60,10 @@ export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
       const isNowDone = !prev[taskName];
       if (isNowDone) {
         confetti({
-          particleCount: 50,
-          spread: 70,
+          particleCount: 40,
+          spread: 60,
           origin: { y: 0.65 },
-          colors: ['#A855F7', '#C084FC', '#00E5FF', '#76B900']
+          colors: ['#FFFFFF', '#A855F7', '#10B981']
         });
       }
       return {
@@ -74,16 +75,20 @@ export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Create / Decompose Goal Form */}
-      <div className="p-7 rounded-3xl bg-gradient-to-br from-obsidian-900/90 via-purple-950/30 to-obsidian-950 border border-purple-500/25 space-y-4 shadow-xl shadow-purple-950/40 backdrop-blur-2xl">
-        <div className="flex items-center gap-2 text-xs font-bold text-synapse-purple uppercase tracking-wider">
-          <Target className="w-4 h-4 text-synapse-purple" />
+      {/* Create / Decompose Goal Form with Magnification */}
+      <motion.div 
+        whileHover={{ scale: 1.012, y: -2 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-4 shadow-xl"
+      >
+        <div className="flex items-center gap-2 text-xs font-bold text-neutral-400 uppercase tracking-wider">
+          <Target className="w-4 h-4 text-white" />
           <span>Autonomous Goal Engine • Nemotron Decomposer</span>
         </div>
-        <h2 className="text-2xl font-extrabold text-white tracking-tight">Define Your North Star Goal</h2>
-        <p className="text-xs text-purple-200/70 max-w-2xl leading-relaxed">
-          Tell SynapseOS what you want to achieve. NVIDIA Nemotron will break it down into strategic phases,
-          derive today's tactical tasks, and sync directly with your morning briefing.
+        <h2 className="text-xl font-bold text-white tracking-tight">Define Your North Star Goal</h2>
+        <p className="text-xs text-neutral-400 max-w-2xl leading-relaxed">
+          Tell SynapseOS what you want to achieve. NVIDIA Nemotron breaks it down into strategic phases,
+          derives today's tactical tasks, and syncs directly with your morning briefing.
         </p>
 
         <form onSubmit={handleDecompose} className="space-y-3 pt-1">
@@ -93,144 +98,176 @@ export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
               value={goalText}
               onChange={(e) => setGoalText(e.target.value)}
               placeholder="e.g. Win Nebius x NVIDIA Hackathon with video demo and polish by Oct 30..."
-              className="flex-1 bg-obsidian-950/90 border border-purple-500/30 focus:border-purple-400 rounded-2xl px-5 py-3 text-xs text-purple-100 placeholder-purple-400/40 focus:outline-none transition-all shadow-inner"
+              className="flex-1 bg-black border border-neutral-800 focus:border-neutral-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none transition-all shadow-inner"
             />
             <div className="flex gap-2">
-              <div className="flex items-center gap-1.5 bg-obsidian-950/90 border border-purple-500/30 rounded-2xl px-4 py-3 text-xs text-purple-300">
-                <Calendar className="w-3.5 h-3.5 text-synapse-purple" />
+              <div className="flex items-center gap-1.5 bg-black border border-neutral-800 rounded-xl px-3 py-2 text-xs text-neutral-300">
+                <Calendar className="w-3.5 h-3.5 text-neutral-400" />
                 <input
                   type="date"
                   value={targetDate}
                   onChange={(e) => setTargetDate(e.target.value)}
-                  className="bg-transparent text-purple-200 text-xs focus:outline-none"
+                  className="bg-transparent text-neutral-200 text-xs focus:outline-none"
                 />
               </div>
-              <button
+
+              {/* Crisp White Action Button */}
+              <motion.button
                 type="submit"
                 disabled={loading || !goalText.trim()}
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 border border-purple-400/40 transition-all active:scale-95 disabled:opacity-50"
+                whileHover={{ scale: 1.06, y: -1 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: "spring", stiffness: 450, damping: 20 }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-black hover:bg-neutral-200 font-semibold text-xs shadow-md shadow-white/10 transition-all active:scale-95 disabled:opacity-50 flex-shrink-0"
               >
                 <Sparkles className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>{loading ? "Decomposing..." : "Decompose Goal"}</span>
-              </button>
+              </motion.button>
             </div>
           </div>
         </form>
-      </div>
+      </motion.div>
 
       {/* Active Decomposition View */}
       {currentDecomposition && (
         <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Header Card */}
-          <div className="p-6 rounded-3xl bg-obsidian-900/80 border border-purple-500/25 space-y-2 backdrop-blur-xl shadow-lg shadow-purple-950/40">
+          {/* Header Card with Magnification */}
+          <motion.div 
+            whileHover={{ scale: 1.01, y: -2 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+            className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2 shadow-lg"
+          >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono text-nebius-cyan uppercase tracking-wider font-bold">
+              <span className="text-[11px] font-mono text-neutral-400 uppercase tracking-wider font-semibold">
                 Strategic Roadmap
               </span>
-              <span className="text-xs text-purple-300/80 flex items-center gap-1">
-                <Flag className="w-3.5 h-3.5 text-synapse-purple" />
+              <span className="text-xs text-neutral-400 flex items-center gap-1">
+                <Flag className="w-3.5 h-3.5 text-white" />
                 <span>Target: {targetDate || "Oct 30, 2026"}</span>
               </span>
             </div>
             <h3 className="text-lg font-bold text-white">{currentDecomposition.goal_title}</h3>
-            <p className="text-xs text-purple-200/70 leading-relaxed max-w-2xl">
+            <p className="text-xs text-neutral-400 leading-relaxed max-w-2xl">
               {currentDecomposition.vision}
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Today's Tactical Tasks */}
-            <div className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 space-y-4 backdrop-blur-xl shadow-lg shadow-purple-950/40">
-              <div className="flex items-center gap-2 text-sm font-bold text-white">
-                <Clock className="w-4 h-4 text-synapse-purple" />
+            <motion.div 
+              whileHover={{ scale: 1.01, y: -2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-4 shadow-lg"
+            >
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Clock className="w-4 h-4 text-white" />
                 <span>Today's Tactical Execution Plan</span>
               </div>
 
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {(currentDecomposition.today_tasks || []).map((t, idx) => {
                   const done = checkedTasks[t.task];
                   return (
-                    <div
+                    <motion.div
                       key={idx}
                       onClick={() => toggleTask(t.task)}
-                      className={`flex items-start justify-between gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                      whileHover={{ scale: 1.025, x: 4 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                      className={`flex items-start justify-between gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
                         done
-                          ? 'bg-obsidian-950/40 border-purple-900/30 opacity-50 line-through text-purple-400/50'
-                          : 'bg-obsidian-950/80 border-purple-500/20 hover:border-purple-400/50 text-purple-100 shadow-sm'
+                          ? 'bg-black/60 border-neutral-900 opacity-40 line-through text-neutral-500'
+                          : 'bg-neutral-900/80 border-neutral-800 hover:border-neutral-700 text-neutral-200 shadow-sm'
                       }`}
                     >
                       <div className="flex items-start gap-2.5">
-                        <CheckCircle2 className={`w-4 h-4 mt-0.5 ${done ? 'text-synapse-purple' : 'text-purple-500/40'}`} />
+                        <CheckCircle2 className={`w-4 h-4 mt-0.5 ${done ? 'text-emerald-400' : 'text-neutral-500'}`} />
                         <span className="text-xs leading-relaxed">{t.task}</span>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <span className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded-md font-bold ${
-                          t.priority === 'HIGH' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-purple-950/50 text-purple-300'
+                        <span className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                          t.priority === 'HIGH' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-neutral-800 text-neutral-300'
                         }`}>
                           {t.priority}
                         </span>
                         {t.estimated_minutes && (
-                          <span className="text-[10px] text-purple-400/60 font-mono">
+                          <span className="text-[10px] text-neutral-500 font-mono">
                             {t.estimated_minutes}m
                           </span>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
 
             {/* Strategic Phases */}
-            <div className="p-6 rounded-3xl bg-obsidian-900/75 border border-purple-500/25 space-y-4 backdrop-blur-xl shadow-lg shadow-purple-950/40">
-              <div className="flex items-center gap-2 text-sm font-bold text-white">
-                <Layers className="w-4 h-4 text-nebius-cyan" />
+            <motion.div 
+              whileHover={{ scale: 1.01, y: -2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-4 shadow-lg"
+            >
+              <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                <Layers className="w-4 h-4 text-white" />
                 <span>Strategic Milestone Phases</span>
               </div>
 
               <div className="space-y-3">
                 {(currentDecomposition.phases || []).map((phase, pIdx) => (
-                  <div key={pIdx} className="p-3.5 rounded-2xl bg-obsidian-950/80 border border-purple-500/20 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-bold text-purple-200">
+                  <motion.div 
+                    key={pIdx} 
+                    whileHover={{ scale: 1.02, x: 3 }}
+                    className="p-3.5 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-2"
+                  >
+                    <div className="flex items-center justify-between text-xs font-semibold text-white">
                       <span>{phase.phase_name}</span>
-                      <span className="text-[10px] font-mono text-purple-400/60">{phase.timeframe}</span>
+                      <span className="text-[10px] font-mono text-neutral-400">{phase.timeframe}</span>
                     </div>
-                    <ul className="space-y-1 text-[11px] text-purple-200/70">
+                    <ul className="space-y-1 text-[11px] text-neutral-400">
                       {(phase.deliverables || []).map((d, dIdx) => (
                         <li key={dIdx} className="flex items-center gap-1.5">
-                          <span className="text-synapse-purple">•</span>
+                          <span className="text-white font-bold">•</span>
                           <span>{d}</span>
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       )}
 
-      {/* Saved Goals List */}
+      {/* Saved Goals List with Magnification */}
       {savedGoals.length > 0 && (
-        <div className="p-6 rounded-3xl bg-obsidian-900/60 border border-purple-500/20 space-y-3 backdrop-blur-xl">
-          <h4 className="text-xs font-bold text-purple-300 uppercase tracking-wider font-mono">
+        <motion.div 
+          whileHover={{ scale: 1.008 }}
+          className="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-3 shadow-lg"
+        >
+          <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider font-mono">
             Active Tracked Goals ({savedGoals.length})
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {savedGoals.map((g) => (
-              <div key={g.id} className="p-3.5 rounded-2xl bg-obsidian-950/80 border border-purple-500/20 flex items-center justify-between">
+              <motion.div 
+                key={g.id} 
+                whileHover={{ scale: 1.025, y: -2 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                className="p-3.5 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-between cursor-pointer"
+              >
                 <div>
-                  <h5 className="text-xs font-bold text-white">{g.title}</h5>
-                  <p className="text-[10px] text-purple-400/60 mt-0.5">Target: {g.target_date || "Ongoing"}</p>
+                  <h5 className="text-xs font-semibold text-white">{g.title}</h5>
+                  <p className="text-[10px] text-neutral-500 mt-0.5">Target: {g.target_date || "Ongoing"}</p>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
                   {g.status}
                 </span>
-              </div>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

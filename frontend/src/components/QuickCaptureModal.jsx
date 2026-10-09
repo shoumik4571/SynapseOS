@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { X, Sparkles, ShieldCheck } from 'lucide-react';
 
 export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
@@ -48,17 +49,22 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="w-full max-w-lg rounded-3xl bg-obsidian-900/95 border border-purple-500/30 shadow-2xl shadow-purple-950/80 p-7 space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-in fade-in duration-200">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 450, damping: 25 }}
+        className="w-full max-w-lg rounded-2xl bg-neutral-950 border border-neutral-800 shadow-2xl p-6 space-y-4"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-purple-500/20">
+        <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-synapse-purple animate-pulse" />
-            <h3 className="text-sm font-bold text-white tracking-tight">Quick Capture (Cmd+K)</h3>
+            <Sparkles className="w-4 h-4 text-white" />
+            <h3 className="text-sm font-semibold text-white tracking-tight">Quick Capture (Cmd+K)</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-purple-400/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-purple-950/40"
+            className="text-neutral-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-neutral-900"
           >
             <X className="w-4 h-4" />
           </button>
@@ -68,18 +74,20 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex gap-2">
             {['thought', 'task', 'note', 'snippet'].map((type) => (
-              <button
+              <motion.button
                 key={type}
                 type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setItemType(type)}
-                className={`text-xs capitalize px-3.5 py-1.5 rounded-xl border transition-all duration-200 ${
+                className={`text-xs capitalize px-3.5 py-1.5 rounded-lg border transition-all ${
                   itemType === type
-                    ? 'bg-purple-600/30 text-purple-200 border-purple-400/50 font-bold shadow-sm shadow-purple-600/30'
-                    : 'bg-obsidian-950/80 text-purple-400/60 border-purple-500/20 hover:text-purple-200'
+                    ? 'bg-white text-black font-semibold border-white shadow-sm'
+                    : 'bg-black text-neutral-400 border-neutral-800 hover:text-white'
                 }`}
               >
                 {type}
-              </button>
+              </motion.button>
             ))}
           </div>
 
@@ -88,7 +96,7 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title or context tag (optional)..."
-            className="w-full bg-obsidian-950/90 border border-purple-500/30 rounded-2xl px-4 py-2.5 text-xs text-purple-100 placeholder-purple-400/40 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30"
+            className="w-full bg-black border border-neutral-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500"
           />
 
           <textarea
@@ -97,11 +105,11 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
             onChange={(e) => setContent(e.target.value)}
             placeholder="What fleeting insight, design constraint, or mental thread are you tracking?"
             required
-            className="w-full bg-obsidian-950/90 border border-purple-500/30 rounded-2xl p-4 text-xs text-purple-100 placeholder-purple-400/40 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30 resize-none font-mono"
+            className="w-full bg-black border border-neutral-800 rounded-xl p-4 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 resize-none font-mono"
           />
 
           {redactionNotice && (
-            <div className="flex items-center gap-2 text-xs text-emerald-300 bg-emerald-500/15 p-3 rounded-2xl border border-emerald-500/30">
+            <div className="flex items-center gap-2 text-xs text-emerald-300 bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>{redactionNotice}</span>
             </div>
@@ -111,20 +119,25 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-xs text-purple-400/60 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-xl text-xs text-neutral-400 hover:text-white transition-colors"
             >
               Cancel
             </button>
-            <button
+
+            {/* Crisp White Action Button */}
+            <motion.button
               type="submit"
               disabled={loading || !content.trim()}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-lg shadow-purple-600/30 border border-purple-400/40 disabled:opacity-50 active:scale-95"
+              whileHover={{ scale: 1.06, y: -1 }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 450, damping: 20 }}
+              className="px-5 py-2 rounded-xl bg-white text-black hover:bg-neutral-200 font-semibold text-xs transition-all shadow-md shadow-white/10 disabled:opacity-50 active:scale-95"
             >
               {loading ? "Capturing..." : "Store in Second Brain"}
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
