@@ -9,3 +9,6 @@ dist/
 *.sqlite
 *.sqlite3
 .DS_Store
+venv/
+backend/venv/
+*.egg-info/
