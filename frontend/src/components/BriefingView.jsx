@@ -11,9 +11,11 @@ export default function BriefingView({ briefing, onRegenerate, loading }) {
     }));
   };
 
-  const data = briefing?.briefing || {};
-  const priorities = data.priorities || [];
-  const openLoops = data.open_loops || [];
+  const data = briefing?.briefing || briefing || {};
+  const priorities = data.priorities || briefing?.priorities || [];
+  const openLoops = data.open_loops || briefing?.open_loops || [];
+  const summary = data.summary || briefing?.summary || "Synthesizing your active workspace context, recent commits, and open loops...";
+  const proactiveTip = data.proactive_tip || briefing?.proactive_tip;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -22,11 +24,11 @@ export default function BriefingView({ briefing, onRegenerate, loading }) {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-nvidia-green uppercase tracking-wider mb-1">
             <Calendar className="w-3.5 h-3.5" />
-            <span>Executive Session Briefing • {briefing?.date || "Today"}</span>
+            <span>Executive Session Briefing • {briefing?.date_str || briefing?.date || "Today"}</span>
           </div>
           <h2 className="text-xl font-bold text-white">Focus & Alignment Kickoff</h2>
           <p className="text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-            {data.summary || "Synthesizing your active workspace context, recent commits, and open loops..."}
+            {summary}
           </p>
         </div>
 
@@ -90,13 +92,13 @@ export default function BriefingView({ briefing, onRegenerate, loading }) {
           </div>
 
           {/* Proactive Tip */}
-          {data.proactive_tip && (
+          {proactiveTip && (
             <div className="p-5 rounded-2xl bg-nebius-violet/10 border border-nebius-violet/20 flex items-start gap-3">
               <Lightbulb className="w-5 h-5 text-nebius-cyan flex-shrink-0 mt-0.5" />
               <div>
                 <h4 className="text-xs font-semibold text-nebius-cyan uppercase tracking-wider">Cognitive Advice</h4>
                 <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                  {data.proactive_tip}
+                  {proactiveTip}
                 </p>
               </div>
             </div>

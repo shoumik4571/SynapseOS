@@ -40,7 +40,7 @@ export default function AmbientDrawer({ briefing, metrics, onCapture }) {
     }
   };
 
-  const priorities = briefing?.briefing?.priorities || [
+  const priorities = briefing?.priorities || briefing?.briefing?.priorities || [
     "Focus on core hackathon deliverables",
     "Validate Nebius Token Factory live streaming",
     "Prepare submission demo"
