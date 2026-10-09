@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import { Target, RefreshCw, AlertCircle, Lightbulb, CheckSquare, Square, Calendar } from 'lucide-react';
+import confetti from 'canvas-confetti';
 
 export default function BriefingView({ briefing, onRegenerate, loading }) {
   const [completedPriorities, setCompletedPriorities] = useState({});
 
   const togglePriority = (idx) => {
-    setCompletedPriorities(prev => ({
-      ...prev,
-      [idx]: !prev[idx]
-    }));
+    setCompletedPriorities(prev => {
+      const isNowDone = !prev[idx];
+      if (isNowDone) {
+        confetti({
+          particleCount: 40,
+          spread: 65,
+          origin: { y: 0.7 },
+          colors: ['#76B900', '#00E5FF', '#10B981']
+        });
+      }
+      return {
+        ...prev,
+        [idx]: isNowDone
+      };
+    });
   };
 
   const data = briefing?.briefing || briefing || {};

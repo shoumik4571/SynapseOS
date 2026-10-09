@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Sparkles, CheckCircle2, Clock, AlertCircle, ChevronRight, Plus, Calendar, Flag } from 'lucide-react';
+import { motion } from 'framer-motion';
+import confetti from 'canvas-confetti';
 
 export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
   const [goalText, setGoalText] = useState('');
@@ -56,10 +58,21 @@ export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
   };
 
   const toggleTask = (taskName) => {
-    setCheckedTasks(prev => ({
-      ...prev,
-      [taskName]: !prev[taskName]
-    }));
+    setCheckedTasks(prev => {
+      const isNowDone = !prev[taskName];
+      if (isNowDone) {
+        confetti({
+          particleCount: 40,
+          spread: 60,
+          origin: { y: 0.65 },
+          colors: ['#76B900', '#00E5FF', '#10B981', '#ffffff']
+        });
+      }
+      return {
+        ...prev,
+        [taskName]: isNowDone
+      };
+    });
   };
 
   return (
