@@ -1,20 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, ShieldAlert, ChevronDown, ChevronRight, Zap, Sparkles } from 'lucide-react';
+import { Send, Bot, User, ShieldAlert, ChevronDown, ChevronRight, Zap, Sparkles, Globe, ExternalLink } from 'lucide-react';
 
 export default function CopilotChat({ onUpdateMetrics }) {
   const [messages, setMessages] = useState([
     {
       id: 1,
       role: 'assistant',
-      content: 'I am SynapseOS, your personal cognitive copilot. I am ambiently grounded in your workspace files and notes via Nebius Token Factory. What are we building or problem-solving right now?',
+      content: 'I am SynapseOS, your personal cognitive copilot. I am ambiently grounded in your workspace files and empowered with live Tavily Web Research via Nebius Token Factory. What are we building or problem-solving right now?',
       metrics: null,
       reasoning: null,
       guardrailAlert: null,
+      tavilySources: null,
     }
   ]);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [webSearchEnabled, setWebSearchEnabled] = useState(true);
+  const [searchingWeb, setSearchingWeb] = useState(false);
   const [openReasoning, setOpenReasoning] = useState({});
+  const [openSources, setOpenSources] = useState({});
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -27,6 +31,13 @@ export default function CopilotChat({ onUpdateMetrics }) {
 
   const toggleReasoning = (msgId) => {
     setOpenReasoning(prev => ({
+      ...prev,
+      [msgId]: !prev[msgId]
+    }));
+  };
+
+  const toggleSources = (msgId) => {
+    setOpenSources(prev => ({
       ...prev,
       [msgId]: !prev[msgId]
     }));
@@ -46,10 +57,11 @@ export default function CopilotChat({ onUpdateMetrics }) {
     setMessages(prev => [
       ...prev,
       { id: userMsgId, role: 'user', content: userText },
-      { id: assistantMsgId, role: 'assistant', content: '', reasoning: '', metrics: null, guardrailAlert: null }
+      { id: assistantMsgId, role: 'assistant', content: '', reasoning: '', metrics: null, guardrailAlert: null, tavilySources: null }
     ]);
 
     setStreaming(true);
+    setSearchingWeb(webSearchEnabled);
 
     try {
       const response = await fetch('/api/chat/stream', {
@@ -57,7 +69,8 @@ export default function CopilotChat({ onUpdateMetrics }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           session_id: 'default-session',
-          message: userText
+          message: userText,
+          web_search: webSearchEnabled,
         }),
       });
 
@@ -78,21 +91,31 @@ export default function CopilotChat({ onUpdateMetrics }) {
             try {
               const chunk = JSON.parse(line.slice(6));
 
-              setMessages(prev => prev.map(msg => {
-                if (msg.id !== assistantMsgId) return msg;
-
-                if (chunk.type === 'token') {
-                  return { ...msg, content: msg.content + chunk.text };
-                } else if (chunk.type === 'reasoning') {
-                  return { ...msg, reasoning: (msg.reasoning || '') + chunk.text };
-                } else if (chunk.type === 'guardrail_alert') {
-                  return { ...msg, guardrailAlert: chunk.message };
-                } else if (chunk.type === 'metrics') {
-                  onUpdateMetrics(chunk.data);
-                  return { ...msg, metrics: chunk.data };
-                }
-                return msg;
-              }));
+              if (chunk.type === 'tavily_status') {
+                setSearchingWeb(chunk.status === 'searching');
+              } else if (chunk.type === 'tavily_sources') {
+                setSearchingWeb(false);
+                setMessages(prev => prev.map(msg => 
+                  msg.id === assistantMsgId ? { ...msg, tavilySources: chunk.sources } : msg
+                ));
+              } else if (chunk.type === 'token') {
+                setMessages(prev => prev.map(msg => 
+                  msg.id === assistantMsgId ? { ...msg, content: msg.content + chunk.text } : msg
+                ));
+              } else if (chunk.type === 'reasoning') {
+                setMessages(prev => prev.map(msg => 
+                  msg.id === assistantMsgId ? { ...msg, reasoning: (msg.reasoning || '') + chunk.text } : msg
+                ));
+              } else if (chunk.type === 'guardrail_alert') {
+                setMessages(prev => prev.map(msg => 
+                  msg.id === assistantMsgId ? { ...msg, guardrailAlert: chunk.message } : msg
+                ));
+              } else if (chunk.type === 'metrics') {
+                onUpdateMetrics(chunk.data);
+                setMessages(prev => prev.map(msg => 
+                  msg.id === assistantMsgId ? { ...msg, metrics: chunk.data } : msg
+                ));
+              }
             } catch (err) {
               console.error('Error parsing SSE data:', err);
             }
@@ -103,6 +126,7 @@ export default function CopilotChat({ onUpdateMetrics }) {
       console.error('Streaming request failed:', err);
     } finally {
       setStreaming(false);
+      setSearchingWeb(false);
     }
   };
 
@@ -156,6 +180,41 @@ export default function CopilotChat({ onUpdateMetrics }) {
                   </div>
                 )}
 
+                {/* Tavily Web Sources Drawer ($3,000 Hackathon Prize Track) */}
+                {msg.tavilySources && msg.tavilySources.length > 0 && (
+                  <div className="text-left mb-2 rounded-xl bg-slate-950/60 border border-slate-800/80 overflow-hidden text-xs">
+                    <button
+                      onClick={() => toggleSources(msg.id)}
+                      className="w-full px-3 py-2 flex items-center justify-between text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-900 transition-colors"
+                    >
+                      <span className="flex items-center gap-1.5 font-mono text-[11px] text-nebius-cyan">
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>Tavily Web Sources ({msg.tavilySources.length} verified)</span>
+                      </span>
+                      {openSources[msg.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                    </button>
+                    {openSources[msg.id] && (
+                      <div className="p-3 space-y-2 bg-slate-950 text-[11px]">
+                        {msg.tavilySources.map((s, sIdx) => (
+                          <a
+                            key={sIdx}
+                            href={s.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="block p-2 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-800/80 transition-colors group"
+                          >
+                            <div className="flex items-center justify-between text-slate-300 font-medium group-hover:text-nebius-cyan">
+                              <span className="truncate">{s.title}</span>
+                              <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-60 ml-2" />
+                            </div>
+                            <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{s.content}</p>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Content Box */}
                 <div className={`p-4 rounded-2xl text-xs leading-relaxed text-left whitespace-pre-wrap ${
                   isAssistant
@@ -164,7 +223,7 @@ export default function CopilotChat({ onUpdateMetrics }) {
                 }`}>
                   {msg.content || (streaming && isAssistant ? (
                     <span className="inline-flex gap-1 items-center text-slate-500 animate-pulse">
-                      <span>Reasoning on Nebius Token Factory</span>
+                      <span>{searchingWeb ? "Researching live web via Tavily..." : "Reasoning on Nebius Token Factory"}</span>
                       <span className="w-1.5 h-1.5 bg-nebius-cyan rounded-full animate-bounce"></span>
                     </span>
                   ) : '')}
@@ -190,14 +249,38 @@ export default function CopilotChat({ onUpdateMetrics }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Bar */}
-      <div className="p-4 bg-slate-950/80 border-t border-slate-800">
+      {/* Input Bar & Controls */}
+      <div className="p-4 bg-slate-950/80 border-t border-slate-800 space-y-2">
+        {/* Web Search Toggle & Status */}
+        <div className="flex items-center justify-between text-xs px-1">
+          <button
+            type="button"
+            onClick={() => setWebSearchEnabled(!webSearchEnabled)}
+            className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+              webSearchEnabled
+                ? 'bg-nebius-cyan/15 text-nebius-cyan border border-nebius-cyan/30'
+                : 'bg-slate-900 text-slate-500 border border-slate-800'
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>Live Web Search: {webSearchEnabled ? "Active" : "Off"}</span>
+            {webSearchEnabled && <span className="text-[10px] bg-nebius-cyan/20 px-1 py-0.2 rounded font-mono">Tavily</span>}
+          </button>
+
+          {searchingWeb && (
+            <span className="flex items-center gap-1.5 text-xs text-nebius-cyan animate-pulse">
+              <span className="w-1.5 h-1.5 bg-nebius-cyan rounded-full animate-ping" />
+              <span>Browsing live web via Tavily...</span>
+            </span>
+          )}
+        </div>
+
         <form onSubmit={handleSend} className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask your second brain, explore ideas, or challenge an architectural pattern..."
+            placeholder="Ask your second brain, explore documentation, or verify live facts..."
             disabled={streaming}
             className="flex-1 bg-slate-900 border border-slate-800 focus:border-nvidia-green rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-colors disabled:opacity-50"
           />

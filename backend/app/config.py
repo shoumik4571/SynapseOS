@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
     nvidia_model: str = "nvidia/llama-3.1-nemotron-70b-instruct"
 
+    # Tavily Web Search
+    tavily_api_key: str = ""
+
     # Server Settings
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000

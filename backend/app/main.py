@@ -60,6 +60,8 @@ class ContextDiffRequest(BaseModel):
 class ChatStreamRequest(BaseModel):
     session_id: str = "default-session"
     message: str
+    web_search: bool = True
+    custom_tavily_key: Optional[str] = None
 
 class GoalDecomposeRequest(BaseModel):
     goal: str
@@ -127,11 +129,21 @@ async def chat_stream(req: ChatStreamRequest):
     async def event_generator():
         async for chunk in copilot_agent.chat_stream(
             session_id=req.session_id,
-            user_message=req.message
+            user_message=req.message,
+            enable_web_search=req.web_search,
+            custom_tavily_key=req.custom_tavily_key
         ):
             yield {"data": json.dumps(chunk)}
 
     return EventSourceResponse(event_generator())
+
+@app.get("/api/tavily/status")
+async def get_tavily_status():
+    return {
+        "connected": bool(settings.tavily_api_key),
+        "provider": "Tavily AI Search",
+        "prize_track": "Best Use of Tavily ($3,000 Cash Prize)"
+    }
 
 @app.get("/api/chat/history/{session_id}")
 async def get_chat_history(session_id: str, limit: int = 30):
