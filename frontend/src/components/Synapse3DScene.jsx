@@ -3,9 +3,9 @@ import * as THREE from 'three';
 
 /**
  * Synapse3DScene
- * High-performance 3D WebGL background powered by Three.js.
- * Renders an interactive, floating 3D neural core, rotating gyroscopic cyber-rings,
- * and 1,800 cosmic nebula particles responding to mouse parallax.
+ * Ultra-subtle, elegant 3D ambient motion graphics (Linear / Apple aesthetic).
+ * Features a dark, metallic fluid Torus Knot with soft studio specular lighting
+ * and fine, gentle stardust particles reacting smoothly to cursor parallax.
  */
 export default function Synapse3DScene() {
   const mountRef = useRef(null);
@@ -16,15 +16,15 @@ export default function Synapse3DScene() {
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030014, 0.0018); // Deep obsidian purple fog
+    scene.fog = new THREE.FogExp2(0x06040d, 0.0035);
 
     const camera = new THREE.PerspectiveCamera(
-      60,
+      45,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    camera.position.z = 85;
+    camera.position.z = 90;
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -33,111 +33,95 @@ export default function Synapse3DScene() {
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
     container.appendChild(renderer.domElement);
 
-    // 2. 3D Objects Group
-    const coreGroup = new THREE.Group();
-    scene.add(coreGroup);
+    // 2. Studio Lighting (Subtle, Moody Purple & Rim Highlights)
+    const ambientLight = new THREE.AmbientLight(0x0e091c, 2.0);
+    scene.add(ambientLight);
 
-    // A. 3D Floating Geometric Neural Core (Icosahedron Wireframe + Inner Glow)
-    const coreGeo = new THREE.IcosahedronGeometry(14, 2);
-    const coreMat = new THREE.MeshBasicMaterial({
-      color: 0x9333ea, // Vivid purple
-      wireframe: true,
+    const dirLight1 = new THREE.DirectionalLight(0x9333ea, 2.8); // Primary soft purple
+    dirLight1.position.set(40, 50, 40);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x6366f1, 1.5); // Indigo fill
+    dirLight2.position.set(-50, -30, -20);
+    scene.add(dirLight2);
+
+    const rimLight = new THREE.PointLight(0x38bdf8, 2.0, 150); // Subtle cyan rim
+    rimLight.position.set(20, -40, 30);
+    scene.add(rimLight);
+
+    // 3. Main 3D Art: Smooth Dark Metallic Fluid Torus Knot
+    const knotGroup = new THREE.Group();
+    scene.add(knotGroup);
+
+    const knotGeo = new THREE.TorusKnotGeometry(15, 3.2, 160, 32, 2, 3);
+    const knotMat = new THREE.MeshStandardMaterial({
+      color: 0x090515,
+      roughness: 0.3,
+      metalness: 0.88,
+      wireframe: false,
+    });
+    const knotMesh = new THREE.Mesh(knotGeo, knotMat);
+    knotGroup.add(knotMesh);
+
+    // Subtle outer halo ring (thin, elegant)
+    const haloGeo = new THREE.TorusGeometry(26, 0.08, 16, 120);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0x8b5cf6,
+      transparent: true,
+      opacity: 0.22,
+    });
+    const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+    haloMesh.rotation.x = Math.PI / 3;
+    knotGroup.add(haloMesh);
+
+    // Position subtly in the upper-right background
+    knotGroup.position.set(32, 12, -20);
+
+    // 4. Subtle, Fine Stardust Field (Soft circular motes, no chunky squares)
+    const starCount = 350;
+    const starGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(starCount * 3);
+    const opacities = new Float32Array(starCount);
+
+    for (let i = 0; i < starCount; i++) {
+      positions[i * 3] = (Math.random() - 0.5) * 260;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 180;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
+      opacities[i] = Math.random() * 0.4 + 0.1;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    // Custom soft circular point texture generated via 2D canvas
+    const createCircleTexture = () => {
+      const cvs = document.createElement('canvas');
+      cvs.width = 32;
+      cvs.height = 32;
+      const ctx = cvs.getContext('2d');
+      const grad = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(216, 180, 254, 0.9)');
+      grad.addColorStop(0.4, 'rgba(168, 85, 247, 0.3)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 32, 32);
+      return new THREE.CanvasTexture(cvs);
+    };
+
+    const starMat = new THREE.PointsMaterial({
+      size: 1.8,
+      map: createCircleTexture(),
       transparent: true,
       opacity: 0.35,
-    });
-    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-    coreGroup.add(coreMesh);
-
-    // Inner glowing sphere
-    const innerGeo = new THREE.SphereGeometry(7, 24, 24);
-    const innerMat = new THREE.MeshBasicMaterial({
-      color: 0xc084fc, // Soft neon purple
-      transparent: true,
-      opacity: 0.2,
-      wireframe: true,
-    });
-    const innerCore = new THREE.Mesh(innerGeo, innerMat);
-    coreGroup.add(innerCore);
-
-    // B. Gyroscopic Orbital Cyber Rings (Torus)
-    const ring1Geo = new THREE.TorusGeometry(22, 0.25, 12, 100);
-    const ring1Mat = new THREE.MeshBasicMaterial({
-      color: 0x8b5cf6, // Violet
-      transparent: true,
-      opacity: 0.45,
-    });
-    const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
-    ring1.rotation.x = Math.PI / 3;
-    coreGroup.add(ring1);
-
-    const ring2Geo = new THREE.TorusGeometry(26, 0.2, 12, 100);
-    const ring2Mat = new THREE.MeshBasicMaterial({
-      color: 0xd946ef, // Cyber magenta
-      transparent: true,
-      opacity: 0.3,
-    });
-    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
-    ring2.rotation.y = Math.PI / 4;
-    ring2.rotation.x = -Math.PI / 6;
-    coreGroup.add(ring2);
-
-    // Subtle third ring in NVIDIA green accent
-    const ring3Geo = new THREE.TorusGeometry(30, 0.15, 8, 80);
-    const ring3Mat = new THREE.MeshBasicMaterial({
-      color: 0x76b900, // NVIDIA green accent
-      transparent: true,
-      opacity: 0.25,
-    });
-    const ring3 = new THREE.Mesh(ring3Geo, ring3Mat);
-    ring3.rotation.z = Math.PI / 5;
-    coreGroup.add(ring3);
-
-    // Position the core slightly offset towards the top-right / background
-    coreGroup.position.set(30, 10, -25);
-
-    // C. 3D Cosmic Neural Particles (1,600 floating nodes)
-    const particleCount = 1600;
-    const particleGeo = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const colors = new Float32Array(particleCount * 3);
-
-    const palette = [
-      new THREE.Color(0xa855f7), // Purple
-      new THREE.Color(0x8b5cf6), // Violet
-      new THREE.Color(0xc084fc), // Light purple
-      new THREE.Color(0xd946ef), // Magenta
-      new THREE.Color(0x00e5ff), // Nebius cyan
-      new THREE.Color(0x76b900), // NVIDIA green
-    ];
-
-    for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 350;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 250;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 250;
-
-      const col = palette[Math.floor(Math.random() * palette.length)];
-      colors[i * 3] = col.r;
-      colors[i * 3 + 1] = col.g;
-      colors[i * 3 + 2] = col.b;
-    }
-
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-    const particleMat = new THREE.PointsMaterial({
-      size: 1.2,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.6,
       blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
 
-    const particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
-    // 3. Mouse Parallax Tracking
+    // 5. Smooth Damped Mouse Parallax
     let targetMouseX = 0;
     let targetMouseY = 0;
     let currentMouseX = 0;
@@ -149,7 +133,6 @@ export default function Synapse3DScene() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // 4. Resize Handling
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -157,43 +140,35 @@ export default function Synapse3DScene() {
     };
     window.addEventListener('resize', handleResize);
 
-    // 5. 60fps Animation Loop
+    // 6. Smooth 60fps Loop
     let animationFrameId;
     let clock = new THREE.Clock();
 
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
+      const elapsed = clock.getElapsedTime();
 
-      // Smooth mouse damping (Lerp)
-      currentMouseX += (targetMouseX - currentMouseX) * 0.05;
-      currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+      // Damped mouse interpolation
+      currentMouseX += (targetMouseX - currentMouseX) * 0.035;
+      currentMouseY += (targetMouseY - currentMouseY) * 0.035;
 
-      // Rotate 3D Core & Rings
-      coreMesh.rotation.y = elapsedTime * 0.15;
-      coreMesh.rotation.x = elapsedTime * 0.08;
+      // Slow, mesmerizing organic rotation of the knot
+      knotMesh.rotation.x = elapsed * 0.08;
+      knotMesh.rotation.y = elapsed * 0.12;
+      knotMesh.rotation.z = Math.sin(elapsed * 0.05) * 0.2;
 
-      innerCore.rotation.y = -elapsedTime * 0.25;
-      innerCore.rotation.z = elapsedTime * 0.12;
+      haloMesh.rotation.z = -elapsed * 0.06;
+      haloMesh.rotation.y = Math.cos(elapsed * 0.04) * 0.15;
 
-      ring1.rotation.z = elapsedTime * 0.2;
-      ring1.rotation.x = Math.PI / 3 + Math.sin(elapsedTime * 0.5) * 0.1;
+      // Subtle breathing scale
+      const s = 1 + Math.sin(elapsed * 0.8) * 0.015;
+      knotMesh.scale.set(s, s, s);
 
-      ring2.rotation.y = -elapsedTime * 0.25;
-      ring2.rotation.x = -Math.PI / 6 + Math.cos(elapsedTime * 0.4) * 0.1;
+      // Subtle starfield drift
+      stars.rotation.y = elapsed * 0.008;
 
-      ring3.rotation.z = -elapsedTime * 0.15;
-
-      // Breathing scale pulse (Cognitive rhythm)
-      const pulseScale = 1 + Math.sin(elapsedTime * 1.5) * 0.04;
-      coreMesh.scale.set(pulseScale, pulseScale, pulseScale);
-
-      // Rotate particle nebula very slowly
-      particles.rotation.y = elapsedTime * 0.02;
-      particles.rotation.x = elapsedTime * 0.01;
-
-      // Parallax camera displacement
-      camera.position.x = currentMouseX * 12;
-      camera.position.y = -currentMouseY * 8;
+      // Camera parallax
+      camera.position.x = currentMouseX * 9;
+      camera.position.y = -currentMouseY * 6;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
@@ -202,7 +177,6 @@ export default function Synapse3DScene() {
 
     animate();
 
-    // Cleanup
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
@@ -211,18 +185,12 @@ export default function Synapse3DScene() {
         container.removeChild(renderer.domElement);
       }
       renderer.dispose();
-      coreGeo.dispose();
-      coreMat.dispose();
-      innerGeo.dispose();
-      innerMat.dispose();
-      ring1Geo.dispose();
-      ring1Mat.dispose();
-      ring2Geo.dispose();
-      ring2Mat.dispose();
-      ring3Geo.dispose();
-      ring3Mat.dispose();
-      particleGeo.dispose();
-      particleMat.dispose();
+      knotGeo.dispose();
+      knotMat.dispose();
+      haloGeo.dispose();
+      haloMat.dispose();
+      starGeo.dispose();
+      starMat.dispose();
     };
   }, []);
 
@@ -231,7 +199,7 @@ export default function Synapse3DScene() {
       ref={mountRef}
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
       style={{
-        background: 'radial-gradient(ellipse at 50% 10%, #150938 0%, #08031d 40%, #030014 90%)'
+        background: 'radial-gradient(ellipse at 60% 0%, #100a26 0%, #080514 45%, #04020a 100%)'
       }}
     />
   );

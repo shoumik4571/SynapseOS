@@ -54,13 +54,9 @@ export default function AmbientDrawer({ briefing, metrics, onCapture }) {
           onClick={() => setIsOpen(true)}
           className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center cursor-pointer group"
         >
-          <div className="bg-obsidian-900/90 hover:bg-obsidian-850 border-l border-y border-purple-500/30 rounded-l-2xl p-2.5 shadow-2xl backdrop-blur-xl flex flex-col items-center gap-2 group-hover:border-purple-400/70 transition-all shadow-purple-950/60">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-synapse-purple opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-synapse-purple"></span>
-            </span>
-            <ChevronLeft className="w-4 h-4 text-purple-400 group-hover:text-purple-200 transition-colors" />
-            <span className="text-[10px] font-mono font-bold text-purple-300 [writing-mode:vertical-rl] tracking-widest uppercase">
+          <div className="bg-[#0d091a]/85 hover:bg-[#150e2a] border-l border-y border-white/[0.08] rounded-l-xl py-3 px-1.5 backdrop-blur-xl flex flex-col items-center gap-1.5 transition-all shadow-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+            <span className="text-[9px] font-mono text-zinc-400 [writing-mode:vertical-rl] tracking-wider uppercase">
               HUD
             </span>
           </div>
@@ -69,7 +65,7 @@ export default function AmbientDrawer({ briefing, metrics, onCapture }) {
 
       {/* Slide-In Glassmorphic Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-84 sm:w-96 bg-obsidian-950/95 border-l border-purple-500/25 backdrop-blur-2xl shadow-2xl shadow-purple-950/80 z-50 transform transition-transform duration-300 ease-out flex flex-col ${
+        className={`fixed top-0 right-0 h-full w-84 sm:w-96 bg-[#090614]/95 border-l border-white/[0.08] backdrop-blur-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-out flex flex-col ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

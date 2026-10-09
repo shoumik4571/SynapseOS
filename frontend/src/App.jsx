@@ -102,9 +102,9 @@ export default function App() {
 
       {/* Main Container */}
       <main className="relative z-10 flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
-        {/* Navigation Tabs - Sticky Glass Bar */}
-        <div className="sticky top-[60px] bg-obsidian-950/75 backdrop-blur-2xl z-30 pt-1 pb-3 flex items-center justify-between border-b border-purple-500/20">
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-obsidian-900/60 border border-purple-500/15 backdrop-blur-xl">
+        {/* Navigation Tabs - Clean, Minimalist Bar */}
+        <div className="sticky top-[56px] bg-[#07050f]/80 backdrop-blur-xl z-30 pt-1 pb-3 flex items-center justify-between border-b border-white/[0.08]">
+          <div className="flex items-center gap-1">
             {[
               { id: 'briefing', label: 'Executive Briefing', icon: Target },
               { id: 'goals', label: 'Goal Engine', icon: Compass },
@@ -119,25 +119,25 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? 'bg-gradient-to-r from-purple-900/80 via-purple-800/70 to-indigo-900/70 text-white shadow-lg shadow-purple-950/90 border border-purple-400/40 ring-1 ring-purple-400/20'
-                      : 'text-purple-300/60 hover:text-white hover:bg-purple-950/30'
+                      ? 'bg-purple-950/60 text-white border border-purple-500/30'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 transition-transform duration-300 ${isActive ? 'text-purple-300 scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]' : 'text-purple-400/50'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-400' : 'text-zinc-500'}`} />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
 
-          <div className="hidden sm:flex items-center gap-3 text-xs text-purple-300/60 font-mono">
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-obsidian-900/80 border border-purple-500/30 text-purple-200 shadow-sm">
-              <span className={`w-1.5 h-1.5 rounded-full ${isDemoMode ? 'bg-nebius-cyan animate-pulse' : 'bg-nvidia-green animate-pulse'}`} />
+          <div className="hidden sm:flex items-center gap-3 text-xs text-zinc-500 font-mono">
+            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0d091a] border border-white/[0.08] text-zinc-400">
+              <span className={`w-1.5 h-1.5 rounded-full ${isDemoMode ? 'bg-nebius-cyan' : 'bg-nvidia-green'}`} />
               <span>{isDemoMode ? "Interactive Demo" : "Nebius Live"}</span>
             </span>
-            <span className="hidden md:inline text-purple-400/50">Track 2: Personal AI</span>
+            <span className="hidden md:inline text-zinc-600">Track 2: Personal AI</span>
           </div>
         </div>
 
