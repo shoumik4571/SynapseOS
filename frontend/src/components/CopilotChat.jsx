@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, ShieldAlert, ChevronDown, ChevronRight, Zap, Sparkles, Globe, ExternalLink } from 'lucide-react';
+import MarkdownRenderer from './MarkdownRenderer';
 
 export default function CopilotChat({ onUpdateMetrics }) {
   const [messages, setMessages] = useState([
@@ -221,13 +222,17 @@ export default function CopilotChat({ onUpdateMetrics }) {
                 )}
 
                 {/* Content Box */}
-                <div className={`p-4 rounded-2xl text-xs leading-relaxed text-left whitespace-pre-wrap ${
+                <div className={`p-4 rounded-2xl text-xs leading-relaxed text-left ${
                   isAssistant
                     ? 'bg-slate-950/80 text-slate-200 border border-slate-800'
-                    : 'bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/30'
+                    : 'bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/30 whitespace-pre-wrap'
                 }`}>
                   {msg.content ? (
-                    msg.content
+                    isAssistant ? (
+                      <MarkdownRenderer content={msg.content} />
+                    ) : (
+                      msg.content
+                    )
                   ) : streaming && isAssistant ? (
                     <span className="inline-flex gap-2 items-center text-slate-400 animate-pulse">
                       <span className="w-2 h-2 bg-nebius-cyan rounded-full animate-ping"></span>

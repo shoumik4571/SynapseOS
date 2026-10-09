@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeftRight, Sparkles, Clock, CheckCircle2, Zap } from 'lucide-react';
+import MarkdownRenderer from './MarkdownRenderer';
 
 export default function ContextDiffView({ onComputeDiff }) {
   const [topic, setTopic] = useState('');
@@ -76,8 +77,8 @@ export default function ContextDiffView({ onComputeDiff }) {
             )}
           </div>
 
-          <div className="prose prose-invert prose-xs max-w-none text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-sans">
-            {diffResult.diff_markdown}
+          <div className="py-1">
+            <MarkdownRenderer content={diffResult.diff_markdown} />
           </div>
         </div>
       )}
