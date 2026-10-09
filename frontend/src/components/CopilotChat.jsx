@@ -83,13 +83,16 @@ export default function CopilotChat({ onUpdateMetrics }) {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n\n');
+        const lines = buffer.split(/\r?\n/);
         buffer = lines.pop() || '';
 
-        for (const line of lines) {
+        for (const rawLine of lines) {
+          const line = rawLine.trim();
           if (line.startsWith('data: ')) {
             try {
-              const chunk = JSON.parse(line.slice(6));
+              const jsonStr = line.slice(6).trim();
+              if (!jsonStr) continue;
+              const chunk = JSON.parse(jsonStr);
 
               if (chunk.type === 'tavily_status') {
                 setSearchingWeb(chunk.status === 'searching');
@@ -100,12 +103,14 @@ export default function CopilotChat({ onUpdateMetrics }) {
                 ));
               } else if (chunk.type === 'token') {
                 setMessages(prev => prev.map(msg => 
-                  msg.id === assistantMsgId ? { ...msg, content: msg.content + chunk.text } : msg
+                  msg.id === assistantMsgId ? { ...msg, content: (msg.content || '') + chunk.text } : msg
                 ));
               } else if (chunk.type === 'reasoning') {
                 setMessages(prev => prev.map(msg => 
                   msg.id === assistantMsgId ? { ...msg, reasoning: (msg.reasoning || '') + chunk.text } : msg
                 ));
+                // Automatically open reasoning drawer so user sees thoughts live
+                setOpenReasoning(prev => ({ ...prev, [assistantMsgId]: true }));
               } else if (chunk.type === 'guardrail_alert') {
                 setMessages(prev => prev.map(msg => 
                   msg.id === assistantMsgId ? { ...msg, guardrailAlert: chunk.message } : msg
@@ -117,7 +122,7 @@ export default function CopilotChat({ onUpdateMetrics }) {
                 ));
               }
             } catch (err) {
-              console.error('Error parsing SSE data:', err);
+              console.error('Error parsing SSE data:', err, line);
             }
           }
         }
@@ -221,12 +226,22 @@ export default function CopilotChat({ onUpdateMetrics }) {
                     ? 'bg-slate-950/80 text-slate-200 border border-slate-800'
                     : 'bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/30'
                 }`}>
-                  {msg.content || (streaming && isAssistant ? (
-                    <span className="inline-flex gap-1 items-center text-slate-500 animate-pulse">
-                      <span>{searchingWeb ? "Researching live web via Tavily..." : "Reasoning on Nebius Token Factory"}</span>
-                      <span className="w-1.5 h-1.5 bg-nebius-cyan rounded-full animate-bounce"></span>
+                  {msg.content ? (
+                    msg.content
+                  ) : streaming && isAssistant ? (
+                    <span className="inline-flex gap-2 items-center text-slate-400 animate-pulse">
+                      <span className="w-2 h-2 bg-nebius-cyan rounded-full animate-ping"></span>
+                      <span>
+                        {searchingWeb 
+                          ? "Researching live web via Tavily Search..." 
+                          : msg.reasoning 
+                          ? "Nemotron is synthesizing verified answer..." 
+                          : "Connecting to Nebius Token Factory..."}
+                      </span>
                     </span>
-                  ) : '')}
+                  ) : (
+                    <span className="text-slate-500 italic">Thinking completed. Check reasoning process above.</span>
+                  )}
                 </div>
 
                 {/* Telemetry Badge */}
