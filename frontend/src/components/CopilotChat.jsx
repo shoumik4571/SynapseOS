@@ -7,7 +7,7 @@ export default function CopilotChat({ onUpdateMetrics }) {
     {
       id: 1,
       role: 'assistant',
-      content: 'I am SynapseOS, your personal cognitive copilot. I am ambiently grounded in your workspace files and empowered with live Tavily Web Research via Nebius Token Factory. What are we building or problem-solving right now?',
+      content: 'I am SynapseOS, your personal ambient cognitive partner. Grounded in your active workspace files with real-time Tavily Web Grounding and powered by NVIDIA Nemotron-3.5-Lightning on Nebius Token Factory. What are we strategizing or building today?',
       metrics: null,
       reasoning: null,
       guardrailAlert: null,
@@ -54,7 +54,6 @@ export default function CopilotChat({ onUpdateMetrics }) {
     const userMsgId = Date.now();
     const assistantMsgId = userMsgId + 1;
 
-    // Add user message & empty assistant placeholder
     setMessages(prev => [
       ...prev,
       { id: userMsgId, role: 'user', content: userText },
@@ -98,38 +97,45 @@ export default function CopilotChat({ onUpdateMetrics }) {
               if (chunk.type === 'tavily_status') {
                 setSearchingWeb(chunk.status === 'searching');
               } else if (chunk.type === 'tavily_sources') {
-                setSearchingWeb(false);
-                setMessages(prev => prev.map(msg => 
-                  msg.id === assistantMsgId ? { ...msg, tavilySources: chunk.sources } : msg
-                ));
-              } else if (chunk.type === 'token') {
-                setMessages(prev => prev.map(msg => 
-                  msg.id === assistantMsgId ? { ...msg, content: (msg.content || '') + chunk.text } : msg
-                ));
-              } else if (chunk.type === 'reasoning') {
-                setMessages(prev => prev.map(msg => 
-                  msg.id === assistantMsgId ? { ...msg, reasoning: (msg.reasoning || '') + chunk.text } : msg
-                ));
-                // Automatically open reasoning drawer so user sees thoughts live
-                setOpenReasoning(prev => ({ ...prev, [assistantMsgId]: true }));
+                setMessages(prev =>
+                  prev.map(m => m.id === assistantMsgId ? { ...m, tavilySources: chunk.sources } : m)
+                );
               } else if (chunk.type === 'guardrail_alert') {
-                setMessages(prev => prev.map(msg => 
-                  msg.id === assistantMsgId ? { ...msg, guardrailAlert: chunk.message } : msg
-                ));
+                setMessages(prev =>
+                  prev.map(m => m.id === assistantMsgId ? { ...m, guardrailAlert: chunk.redactions } : m)
+                );
+              } else if (chunk.type === 'reasoning') {
+                setMessages(prev =>
+                  prev.map(m => m.id === assistantMsgId ? { ...m, reasoning: (m.reasoning || '') + chunk.text } : m)
+                );
+                setOpenReasoning(prev => ({ ...prev, [assistantMsgId]: true }));
+              } else if (chunk.type === 'token') {
+                setMessages(prev =>
+                  prev.map(m => m.id === assistantMsgId ? { ...m, content: (m.content || '') + chunk.text } : m)
+                );
               } else if (chunk.type === 'metrics') {
-                onUpdateMetrics(chunk.data);
-                setMessages(prev => prev.map(msg => 
-                  msg.id === assistantMsgId ? { ...msg, metrics: chunk.data } : msg
-                ));
+                setMessages(prev =>
+                  prev.map(m => m.id === assistantMsgId ? { ...m, metrics: chunk.data } : m)
+                );
+                if (onUpdateMetrics) {
+                  onUpdateMetrics(chunk.data);
+                }
               }
             } catch (err) {
-              console.error('Error parsing SSE data:', err, line);
+              console.error("Error parsing SSE JSON:", err);
             }
           }
         }
       }
     } catch (err) {
-      console.error('Streaming request failed:', err);
+      console.error(err);
+      setMessages(prev =>
+        prev.map(m =>
+          m.id === assistantMsgId
+            ? { ...m, content: "Error communicating with Nebius Token Factory. Please verify your connection." }
+            : m
+        )
+      );
     } finally {
       setStreaming(false);
       setSearchingWeb(false);
@@ -137,83 +143,111 @@ export default function CopilotChat({ onUpdateMetrics }) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] max-w-4xl mx-auto rounded-2xl bg-slate-900/40 border border-slate-800 overflow-hidden">
-      {/* Chat Messages Scroll Area */}
+    <div className="flex flex-col h-[680px] rounded-3xl bg-obsidian-900/80 border border-purple-500/25 overflow-hidden shadow-2xl shadow-purple-950/50 backdrop-blur-2xl">
+      {/* Top Header Bar */}
+      <div className="px-6 py-4 border-b border-purple-500/20 bg-obsidian-950/70 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-purple-900/40 border border-purple-500/30 flex items-center justify-center text-synapse-purple shadow-sm">
+            <Bot className="w-4 h-4" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <span>Thought Partner Copilot</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                Nemotron-3.5
+              </span>
+            </h3>
+            <p className="text-[11px] text-purple-300/60">Local Memory Grounding + Live Tavily Search</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-950/60 border border-purple-500/30 text-xs font-mono text-purple-300">
+            <Sparkles className="w-3.5 h-3.5 text-synapse-purple animate-pulse" />
+            <span>Nebius Token Factory</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto p-6 space-y-5">
         {messages.map((msg) => {
           const isAssistant = msg.role === 'assistant';
-          const isReasoningOpen = openReasoning[msg.id] ?? false;
+          const isReasoningOpen = openReasoning[msg.id];
 
           return (
-            <div key={msg.id} className={`flex gap-3.5 ${isAssistant ? 'items-start' : 'items-start flex-row-reverse'}`}>
+            <div
+              key={msg.id}
+              className={`flex gap-3.5 ${isAssistant ? 'items-start' : 'items-start flex-row-reverse'}`}
+            >
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs ${
-                isAssistant 
-                  ? 'bg-slate-800 text-nvidia-green border border-slate-700 shadow-sm' 
-                  : 'bg-nebius-cyan/20 text-nebius-cyan border border-nebius-cyan/30'
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-xs shadow-md ${
+                isAssistant
+                  ? 'bg-purple-900/40 text-purple-300 border border-purple-500/30'
+                  : 'bg-indigo-900/40 text-indigo-200 border border-indigo-500/30'
               }`}>
                 {isAssistant ? <Bot className="w-4 h-4" /> : <User className="w-4 h-4" />}
               </div>
 
-              {/* Message Bubble */}
-              <div className={`max-w-[85%] space-y-2 ${isAssistant ? '' : 'text-right'}`}>
-                {/* Guardrail Alert Pill */}
-                {msg.guardrailAlert && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-300">
-                    <ShieldAlert className="w-3.5 h-3.5" />
-                    <span>{msg.guardrailAlert}</span>
+              {/* Message Payload */}
+              <div className={`space-y-2 max-w-2xl ${isAssistant ? 'w-full' : ''}`}>
+                {/* NeMo Privacy Guardrail Warning */}
+                {msg.guardrailAlert && msg.guardrailAlert.length > 0 && (
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-purple-950/50 border border-purple-500/40 text-purple-200 text-xs">
+                    <ShieldAlert className="w-4 h-4 text-synapse-purple flex-shrink-0" />
+                    <span>NeMo Privacy Guardrail redacted sensitive secrets before cloud transmission: <strong>{msg.guardrailAlert.join(', ')}</strong></span>
                   </div>
                 )}
 
-                {/* Reasoning Drawer (for NVIDIA Nemotron reasoning tokens) */}
+                {/* Reasoning Process Drawer */}
                 {msg.reasoning && (
-                  <div className="text-left mb-2 rounded-xl bg-slate-950/60 border border-slate-800/80 overflow-hidden text-xs">
+                  <div className="text-left mb-2 rounded-2xl bg-obsidian-950/70 border border-purple-500/25 overflow-hidden text-xs shadow-sm">
                     <button
                       onClick={() => toggleReasoning(msg.id)}
-                      className="w-full px-3 py-2 flex items-center justify-between text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-900 transition-colors"
+                      className="w-full px-4 py-2.5 flex items-center justify-between text-purple-300/80 hover:text-white bg-purple-950/40 hover:bg-purple-950/60 transition-colors"
                     >
-                      <span className="flex items-center gap-1.5 font-mono text-[11px] text-nvidia-green">
-                        <Sparkles className="w-3 h-3" />
-                        <span>Nemotron Reasoning Process</span>
+                      <span className="flex items-center gap-2 font-mono text-[11px] text-synapse-purple font-semibold">
+                        <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                        <span>Nemotron Reasoning Process ({msg.reasoning.length} chars)</span>
                       </span>
                       {isReasoningOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                     </button>
                     {isReasoningOpen && (
-                      <div className="p-3 text-[11px] text-slate-400 leading-relaxed font-mono whitespace-pre-wrap max-h-60 overflow-y-auto bg-slate-950">
+                      <div className="p-4 text-[11px] text-purple-200/80 leading-relaxed font-mono whitespace-pre-wrap max-h-60 overflow-y-auto bg-obsidian-950/90 border-t border-purple-500/20">
                         {msg.reasoning}
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Tavily Web Sources Drawer ($3,000 Hackathon Prize Track) */}
+                {/* Tavily Web Sources Drawer */}
                 {msg.tavilySources && msg.tavilySources.length > 0 && (
-                  <div className="text-left mb-2 rounded-xl bg-slate-950/60 border border-slate-800/80 overflow-hidden text-xs">
+                  <div className="text-left mb-2 rounded-2xl bg-obsidian-950/70 border border-purple-500/25 overflow-hidden text-xs shadow-sm">
                     <button
                       onClick={() => toggleSources(msg.id)}
-                      className="w-full px-3 py-2 flex items-center justify-between text-slate-400 hover:text-slate-200 bg-slate-900/60 hover:bg-slate-900 transition-colors"
+                      className="w-full px-4 py-2.5 flex items-center justify-between text-purple-300/80 hover:text-white bg-purple-950/40 hover:bg-purple-950/60 transition-colors"
                     >
-                      <span className="flex items-center gap-1.5 font-mono text-[11px] text-nebius-cyan">
+                      <span className="flex items-center gap-2 font-mono text-[11px] text-nebius-cyan font-semibold">
                         <Globe className="w-3.5 h-3.5" />
                         <span>Tavily Web Sources ({msg.tavilySources.length} verified)</span>
                       </span>
                       {openSources[msg.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                     </button>
                     {openSources[msg.id] && (
-                      <div className="p-3 space-y-2 bg-slate-950 text-[11px]">
+                      <div className="p-3.5 space-y-2 bg-obsidian-950/90 border-t border-purple-500/20 text-[11px]">
                         {msg.tavilySources.map((s, sIdx) => (
                           <a
                             key={sIdx}
                             href={s.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="block p-2 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-800/80 transition-colors group"
+                            className="block p-2.5 rounded-xl bg-purple-950/30 hover:bg-purple-900/40 border border-purple-500/20 transition-colors group"
                           >
-                            <div className="flex items-center justify-between text-slate-300 font-medium group-hover:text-nebius-cyan">
+                            <div className="flex items-center justify-between text-purple-200 font-semibold group-hover:text-nebius-cyan">
                               <span className="truncate">{s.title}</span>
                               <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-60 ml-2" />
                             </div>
-                            <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">{s.content}</p>
+                            <p className="text-[10px] text-purple-300/60 line-clamp-2 mt-1">{s.content}</p>
                           </a>
                         ))}
                       </div>
@@ -221,11 +255,11 @@ export default function CopilotChat({ onUpdateMetrics }) {
                   </div>
                 )}
 
-                {/* Content Box */}
+                {/* Main Content Box */}
                 <div className={`p-4 rounded-2xl text-xs leading-relaxed text-left ${
                   isAssistant
-                    ? 'bg-slate-950/80 text-slate-200 border border-slate-800'
-                    : 'bg-nvidia-green/10 text-nvidia-green border border-nvidia-green/30 whitespace-pre-wrap'
+                    ? 'bg-obsidian-950/90 text-purple-100 border border-purple-500/20 shadow-md shadow-purple-950/40'
+                    : 'bg-gradient-to-r from-purple-900/60 to-indigo-900/60 text-white border border-purple-400/40 shadow-lg shadow-purple-950/50 whitespace-pre-wrap'
                 }`}>
                   {msg.content ? (
                     isAssistant ? (
@@ -234,8 +268,8 @@ export default function CopilotChat({ onUpdateMetrics }) {
                       msg.content
                     )
                   ) : streaming && isAssistant ? (
-                    <span className="inline-flex gap-2 items-center text-slate-400 animate-pulse">
-                      <span className="w-2 h-2 bg-nebius-cyan rounded-full animate-ping"></span>
+                    <span className="inline-flex gap-2 items-center text-purple-300 animate-pulse">
+                      <span className="w-2 h-2 bg-synapse-purple rounded-full animate-ping"></span>
                       <span>
                         {searchingWeb 
                           ? "Researching live web via Tavily Search..." 
@@ -245,15 +279,15 @@ export default function CopilotChat({ onUpdateMetrics }) {
                       </span>
                     </span>
                   ) : (
-                    <span className="text-slate-500 italic">Thinking completed. Check reasoning process above.</span>
+                    <span className="text-purple-400/50 italic">Thinking completed. Check reasoning process above.</span>
                   )}
                 </div>
 
                 {/* Telemetry Badge */}
                 {msg.metrics && (
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-slate-500 pt-1">
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <Zap className="w-3 h-3 text-yellow-400" />
+                  <div className="flex items-center gap-2 text-[10px] font-mono text-purple-400/60 pt-1">
+                    <span className="flex items-center gap-1 text-purple-300">
+                      <Zap className="w-3 h-3 text-synapse-purple" />
                       <span>{msg.metrics.tokens_per_second} tok/s</span>
                     </span>
                     <span>•</span>
@@ -270,21 +304,20 @@ export default function CopilotChat({ onUpdateMetrics }) {
       </div>
 
       {/* Input Bar & Controls */}
-      <div className="p-4 bg-slate-950/80 border-t border-slate-800 space-y-2">
-        {/* Web Search Toggle & Status */}
+      <div className="p-4 bg-obsidian-950/80 border-t border-purple-500/20 space-y-2.5">
         <div className="flex items-center justify-between text-xs px-1">
           <button
             type="button"
             onClick={() => setWebSearchEnabled(!webSearchEnabled)}
-            className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
               webSearchEnabled
-                ? 'bg-nebius-cyan/15 text-nebius-cyan border border-nebius-cyan/30'
-                : 'bg-slate-900 text-slate-500 border border-slate-800'
+                ? 'bg-purple-900/40 text-purple-200 border border-purple-400/40 shadow-sm'
+                : 'bg-obsidian-900 text-purple-400/50 border border-purple-500/20'
             }`}
           >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Live Web Search: {webSearchEnabled ? "Active" : "Off"}</span>
-            {webSearchEnabled && <span className="text-[10px] bg-nebius-cyan/20 px-1 py-0.2 rounded font-mono">Tavily</span>}
+            <Globe className="w-3.5 h-3.5 text-nebius-cyan" />
+            <span>Live Web Grounding: {webSearchEnabled ? "Active" : "Off"}</span>
+            {webSearchEnabled && <span className="text-[10px] bg-nebius-cyan/20 text-nebius-cyan px-1.5 py-0.2 rounded font-mono">Tavily</span>}
           </button>
 
           {searchingWeb && (
@@ -302,12 +335,12 @@ export default function CopilotChat({ onUpdateMetrics }) {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask your second brain, explore documentation, or verify live facts..."
             disabled={streaming}
-            className="flex-1 bg-slate-900 border border-slate-800 focus:border-nvidia-green rounded-xl px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-colors disabled:opacity-50"
+            className="flex-1 bg-obsidian-950/90 border border-purple-500/30 focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30 rounded-2xl px-5 py-3 text-xs text-purple-100 placeholder-purple-400/40 focus:outline-none transition-all disabled:opacity-50 shadow-inner"
           />
           <button
             type="submit"
             disabled={streaming || !input.trim()}
-            className="px-4 py-2.5 rounded-xl bg-nvidia-green hover:bg-nvidia-dark text-slate-950 font-semibold text-xs transition-all disabled:opacity-40 flex items-center justify-center"
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-lg shadow-purple-600/30 disabled:opacity-40 flex items-center justify-center active:scale-95"
           >
             <Send className="w-4 h-4" />
           </button>

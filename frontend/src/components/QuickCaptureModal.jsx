@@ -48,17 +48,17 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-6 space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-xl animate-in fade-in duration-200">
+      <div className="w-full max-w-lg rounded-3xl bg-obsidian-900/95 border border-purple-500/30 shadow-2xl shadow-purple-950/80 p-7 space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-purple-500/20">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-nvidia-green" />
-            <h3 className="text-sm font-bold text-white">Quick Capture (Cmd+K)</h3>
+            <Sparkles className="w-4 h-4 text-synapse-purple animate-pulse" />
+            <h3 className="text-sm font-bold text-white tracking-tight">Quick Capture (Cmd+K)</h3>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors"
+            className="text-purple-400/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-purple-950/40"
           >
             <X className="w-4 h-4" />
           </button>
@@ -72,10 +72,10 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
                 key={type}
                 type="button"
                 onClick={() => setItemType(type)}
-                className={`text-xs capitalize px-3 py-1.5 rounded-lg border transition-all ${
+                className={`text-xs capitalize px-3.5 py-1.5 rounded-xl border transition-all duration-200 ${
                   itemType === type
-                    ? 'bg-nvidia-green/20 text-nvidia-green border-nvidia-green/40 font-medium'
-                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+                    ? 'bg-purple-600/30 text-purple-200 border-purple-400/50 font-bold shadow-sm shadow-purple-600/30'
+                    : 'bg-obsidian-950/80 text-purple-400/60 border-purple-500/20 hover:text-purple-200'
                 }`}
               >
                 {type}
@@ -88,7 +88,7 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title or context tag (optional)..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-nvidia-green"
+            className="w-full bg-obsidian-950/90 border border-purple-500/30 rounded-2xl px-4 py-2.5 text-xs text-purple-100 placeholder-purple-400/40 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30"
           />
 
           <textarea
@@ -97,28 +97,28 @@ export default function QuickCaptureModal({ isOpen, onClose, onCaptured }) {
             onChange={(e) => setContent(e.target.value)}
             placeholder="What fleeting insight, design constraint, or mental thread are you tracking?"
             required
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-nvidia-green resize-none font-mono"
+            className="w-full bg-obsidian-950/90 border border-purple-500/30 rounded-2xl p-4 text-xs text-purple-100 placeholder-purple-400/40 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30 resize-none font-mono"
           />
 
           {redactionNotice && (
-            <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-xs text-emerald-300 bg-emerald-500/15 p-3 rounded-2xl border border-emerald-500/30">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
               <span>{redactionNotice}</span>
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-2.5 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white transition-colors"
+              className="px-4 py-2.5 rounded-xl text-xs text-purple-400/60 hover:text-white transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !content.trim()}
-              className="px-5 py-2 rounded-xl bg-nvidia-green hover:bg-nvidia-dark text-slate-950 font-semibold text-xs transition-all disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs transition-all shadow-lg shadow-purple-600/30 border border-purple-400/40 disabled:opacity-50 active:scale-95"
             >
               {loading ? "Capturing..." : "Store in Second Brain"}
             </button>

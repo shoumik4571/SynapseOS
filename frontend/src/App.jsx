@@ -8,7 +8,7 @@ import QuickCaptureModal from './components/QuickCaptureModal';
 import GoalPlannerView from './components/GoalPlannerView';
 import SettingsModal from './components/SettingsModal';
 import AmbientDrawer from './components/AmbientDrawer';
-import NeuralBackground from './components/NeuralBackground';
+import Synapse3DScene from './components/Synapse3DScene';
 import BenchmarkView from './components/BenchmarkView';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Target, MessageSquare, ArrowLeftRight, Database, Compass, Gauge } from 'lucide-react';
@@ -85,9 +85,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-x-hidden">
-      {/* 60fps Ambient Neural Mesh Canvas */}
-      <NeuralBackground />
+    <div className="relative min-h-screen bg-obsidian-950 text-slate-100 flex flex-col font-sans overflow-x-hidden selection:bg-purple-600 selection:text-white">
+      {/* 3D WebGL Neural Core & Nebula Cosmic Particles */}
+      <Synapse3DScene />
 
       {/* Top Header with live Nebius Telemetry */}
       <div className="relative z-10">
@@ -102,9 +102,9 @@ export default function App() {
 
       {/* Main Container */}
       <main className="relative z-10 flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-6">
-        {/* Navigation Tabs - Sticky */}
-        <div className="sticky top-[60px] bg-slate-950/80 backdrop-blur-md z-30 pt-1 pb-3 flex items-center justify-between border-b border-slate-800/80">
-          <div className="flex items-center gap-2">
+        {/* Navigation Tabs - Sticky Glass Bar */}
+        <div className="sticky top-[60px] bg-obsidian-950/75 backdrop-blur-2xl z-30 pt-1 pb-3 flex items-center justify-between border-b border-purple-500/20">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-obsidian-900/60 border border-purple-500/15 backdrop-blur-xl">
             {[
               { id: 'briefing', label: 'Executive Briefing', icon: Target },
               { id: 'goals', label: 'Goal Engine', icon: Compass },
@@ -119,25 +119,25 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-300 ${
                     isActive
-                      ? 'bg-slate-800/90 text-white shadow-lg shadow-nvidia-green/5 border border-nvidia-green/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                      ? 'bg-gradient-to-r from-purple-900/80 via-purple-800/70 to-indigo-900/70 text-white shadow-lg shadow-purple-950/90 border border-purple-400/40 ring-1 ring-purple-400/20'
+                      : 'text-purple-300/60 hover:text-white hover:bg-purple-950/30'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-nvidia-green animate-pulse' : 'text-slate-500'}`} />
+                  <Icon className={`w-3.5 h-3.5 transition-transform duration-300 ${isActive ? 'text-purple-300 scale-110 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]' : 'text-purple-400/50'}`} />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
 
-          <div className="hidden sm:flex items-center gap-3 text-xs text-slate-500 font-mono">
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-slate-400">
+          <div className="hidden sm:flex items-center gap-3 text-xs text-purple-300/60 font-mono">
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-obsidian-900/80 border border-purple-500/30 text-purple-200 shadow-sm">
               <span className={`w-1.5 h-1.5 rounded-full ${isDemoMode ? 'bg-nebius-cyan animate-pulse' : 'bg-nvidia-green animate-pulse'}`} />
               <span>{isDemoMode ? "Interactive Demo" : "Nebius Live"}</span>
             </span>
-            <span className="hidden md:inline">Track 2: Personal AI</span>
+            <span className="hidden md:inline text-purple-400/50">Track 2: Personal AI</span>
           </div>
         </div>
 
