@@ -310,8 +310,60 @@ export default function CopilotChat({ onUpdateMetrics }) {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* 1-Click Test Prompts for Evaluators & Judges */}
+      <div className="px-4 pt-3 pb-1 bg-neutral-900/40 border-t border-neutral-800/80 flex flex-wrap items-center gap-2">
+        <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">Quick Tests:</span>
+        <button
+          type="button"
+          disabled={streaming}
+          onClick={() => {
+            setInput("Search latest NVIDIA Nemotron benchmarks and Nebius Token Factory docs via Tavily");
+            setTimeout(() => {
+              const form = document.getElementById("chat-form");
+              if (form) form.requestSubmit();
+            }, 50);
+          }}
+          className="px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 text-[11px] text-cyan-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+        >
+          <Globe className="w-3 h-3 text-cyan-400" />
+          <span>Test Tavily Live Search</span>
+        </button>
+
+        <button
+          type="button"
+          disabled={streaming}
+          onClick={() => {
+            setInput("Explain in 3 concise points how 165+ tok/s streaming latency from Nebius H100 transforms desktop productivity");
+            setTimeout(() => {
+              const form = document.getElementById("chat-form");
+              if (form) form.requestSubmit();
+            }, 50);
+          }}
+          className="px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 text-[11px] text-violet-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+        >
+          <Zap className="w-3 h-3 text-violet-400" />
+          <span>Test 165+ tok/s Inference</span>
+        </button>
+
+        <button
+          type="button"
+          disabled={streaming}
+          onClick={() => {
+            setInput("Verify privacy firewall: Here is an API key sk-live-9382173921 and email test@company.com - verify that NeMo Guardrails redacts them");
+            setTimeout(() => {
+              const form = document.getElementById("chat-form");
+              if (form) form.requestSubmit();
+            }, 50);
+          }}
+          className="px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700/80 text-[11px] text-emerald-300 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+        >
+          <ShieldAlert className="w-3 h-3 text-emerald-400" />
+          <span>Test NeMo Privacy Shield</span>
+        </button>
+      </div>
+
       {/* Input Bar & Controls */}
-      <div className="p-4 bg-neutral-900/60 border-t border-neutral-800 space-y-2.5">
+      <div className="p-4 bg-neutral-900/60 border-t border-neutral-800/60 space-y-2.5">
         <div className="flex items-center justify-between text-xs px-1">
           <button
             type="button"
@@ -335,7 +387,7 @@ export default function CopilotChat({ onUpdateMetrics }) {
           )}
         </div>
 
-        <form onSubmit={handleSend} className="flex gap-2">
+        <form id="chat-form" onSubmit={handleSend} className="flex gap-2">
           <input
             type="text"
             value={input}
