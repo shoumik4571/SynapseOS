@@ -8,7 +8,7 @@ import json
 import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any, Optional, List
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
@@ -22,6 +22,7 @@ from app.agents.briefing_agent import briefing_agent
 from app.agents.context_diff_agent import context_diff_agent
 from app.agents.copilot_agent import copilot_agent
 from app.agents.goal_agent import goal_agent
+from app.agents.schedule_structurer_agent import schedule_structurer
 import httpx
 
 @asynccontextmanager
@@ -67,6 +68,12 @@ class ChatStreamRequest(BaseModel):
 class GoalDecomposeRequest(BaseModel):
     goal: str
     target_date: Optional[str] = ""
+
+class ScheduleStructureRequest(BaseModel):
+    schedule_input: str
+    tasks_detail: str
+    deadline: Optional[str] = None
+    attachments_summary: Optional[str] = None
 
 class VerifyKeyRequest(BaseModel):
     api_key: str
@@ -120,6 +127,32 @@ async def get_latest_briefing():
         # Generate on the fly if none exists
         return await briefing_agent.generate_briefing()
     return latest
+
+@app.post("/api/schedule/structure")
+async def structure_schedule(req: ScheduleStructureRequest):
+    result = await schedule_structurer.structure_day(
+        schedule_input=req.schedule_input,
+        tasks_detail=req.tasks_detail,
+        deadline=req.deadline,
+        attachments_summary=req.attachments_summary
+    )
+    return result
+
+@app.post("/api/schedule/upload")
+async def upload_schedule_attachment(file: UploadFile = File(...)):
+    contents = await file.read()
+    text_preview = ""
+    try:
+        text_preview = contents.decode("utf-8")[:1000]
+    except Exception:
+        text_preview = f"[Binary file: {file.content_type}]"
+    
+    return {
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "size": len(contents),
+        "preview": text_preview
+    }
 
 @app.post("/api/context-diff")
 async def compute_context_diff(req: ContextDiffRequest):

@@ -194,6 +194,7 @@ export default function App() {
                   briefing={briefing}
                   onRegenerate={regenerateBriefing}
                   loading={loadingBriefing}
+                  onUpdateMetrics={(m) => setMetrics(m)}
                 />
               )}
 
