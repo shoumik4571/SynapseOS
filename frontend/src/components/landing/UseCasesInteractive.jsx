@@ -1,91 +1,86 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Code, Briefcase, Search, ArrowRight, CheckCircle, Globe, Shield, Sparkles } from 'lucide-react';
+import { Briefcase, PenTool, BookOpen, CheckCircle, Sparkles, Copy, Check } from 'lucide-react';
 
 const cases = [
   {
-    id: 'engineers',
-    label: 'Software Engineers',
-    icon: Code,
-    role: 'Full-Stack & Systems Engineers',
-    input: 'Review git diff on branch fix/token-streamer, check for concurrency bottlenecks, and propose unit tests.',
-    output: {
-      tag: 'ARCHITECTURE & CODE SYNTHESIS',
-      time: '182ms • 170.4 tok/s',
-      summary: 'Detected 1 mutex lock contention at line 42. Formulated async channel buffer fix.',
-      codeBlock: `// Auto-generated atomic buffer fix\nconst bufferChan = make(chan TokenPayload, 256);\ngo func() {\n  for token := range bufferChan {\n    streamer.WriteToken(token)\n  }\n}()`,
-      nextActions: [
-        'Run test suite: `go test -race ./streamer/...`',
-        'Draft GitHub PR with Nebius benchmark metrics',
-      ],
-    },
-  },
-  {
-    id: 'founders',
-    label: 'Founders & Tech Leads',
+    id: 'professionals',
+    label: 'Daily Work & Planning',
     icon: Briefcase,
-    role: 'Startups & Engineering Leaders',
-    input: 'Synthesize overnight user feedback reports and draft my morning executive standup priorities.',
+    persona: 'For busy professionals & founders',
+    input: 'Look at my schedule for today, summarize what matters most, and draft a quick update for the team.',
     output: {
-      tag: 'EXECUTIVE BRIEFING & ACTION MATRIX',
-      time: '240ms • 168.1 tok/s',
-      summary: '14 user signals grouped into 3 themes: latency wins (88%), BYOK request (8%), pricing clarity (4%).',
-      codeBlock: `[PRIORITY 1]: Ship BYOK Nebius key entry modal (Blocks 3 enterprise trials)\n[PRIORITY 2]: Update landing page benchmark telemetry to reflect 165+ tok/s\n[PRIORITY 3]: Schedule demo recording for Hackathon submission video`,
-      nextActions: [
-        'Export action items to Linear / Notion',
-        'Pre-compose email update to angel investors',
-      ],
+      tag: 'DAILY SUMMARY & DRAFT',
+      preview: 'Good morning! Here is your plan:',
+      content: `• 11:30 AM: Client design review (Proposal attached)\n• 2:00 PM: Focus block for product release\n• Action item: Follow up with Sarah regarding Q4 budget`,
+      draft: `Team Update Draft:\n"Morning everyone! Focusing on the product release today after our 11:30 design review. Let me know if anyone needs quick feedback before then."`,
     },
   },
   {
-    id: 'researchers',
-    label: 'Deep Researchers',
-    icon: Search,
-    role: 'AI Researchers & Analysts',
-    input: 'Compare FP8 vs INT4 quantization tradeoffs on NVIDIA Nemotron-3.5 with live web citations.',
+    id: 'writing',
+    label: 'Writing & Polishing',
+    icon: PenTool,
+    persona: 'For clear communication',
+    input: 'Rewrite my blunt email to sound warm, professional, and appreciative.',
     output: {
-      tag: 'TAVILY GROUNDED RESEARCH REPORT',
-      time: '310ms • 165.9 tok/s',
-      summary: 'Queried 5 web sources via Tavily API. Nemotron retains 99.2% MMLU accuracy under FP8 on H100.',
-      codeBlock: `// Citations verified via Tavily:\n[1] docs.nebius.ai/token-factory/benchmarks-2026\n[2] developer.nvidia.com/nemotron-3-5-lightning\n=> Recommendation: Keep FP8 enabled for 2.4x speedup with zero logic degradation.`,
-      nextActions: [
-        'Add reference links to research bibliography',
-        'Cache findings to local SQLite vector store',
-      ],
+      tag: 'POLISHED EMAIL DRAFT',
+      preview: 'Here is a warm, polite revision:',
+      content: `Before: "I need this report by 3pm today or we will miss the deadline."`,
+      draft: `"Hi team, thank you for all your hard work on this! Could we please finalize the report by 3:00 PM today so we stay on schedule for our review? Let me know if there are any blockers."`,
+    },
+  },
+  {
+    id: 'research',
+    label: 'Instant Research & Summaries',
+    icon: BookOpen,
+    persona: 'For students, analysts & researchers',
+    input: 'Summarize the key takeaways from this article and explain the main conclusion in simple words.',
+    output: {
+      tag: 'EXECUTIVE SUMMARY',
+      preview: 'Key insights from 12-page document:',
+      content: `1. Productivity increases by 34% when using ambient desktop AI.\n2. Users save an average of 42 minutes per day on email drafting.\n3. Privacy-first local filtering eliminates data breach risks.`,
+      draft: `In short: Desktop AI assistants save significant daily time by handling small repetitive tasks while keeping sensitive data private on your computer.`,
     },
   },
 ];
 
 export default function UseCasesInteractive() {
   const [activeCase, setActiveCase] = useState(cases[0]);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <section id="use-cases" className="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
-      <div className="text-center max-w-3xl mx-auto mb-14">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-xs font-mono mb-4">
-          REAL-WORLD WORKFLOWS
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight">
-          Built for High-Leverage Builders
+    <section id="use-cases" className="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+      <div className="text-center max-w-2xl mx-auto mb-12">
+        <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-white tracking-tight">
+          Everyday Scenarios
         </h2>
-        <p className="mt-4 text-base sm:text-lg text-zinc-400">
-          See how SynapseOS transforms natural desktop input into concrete results in under a second.
+        <p className="mt-3 text-base text-zinc-400">
+          See how SynapseOS saves you time throughout your day with simple, natural requests.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
         {cases.map((c) => {
           const Icon = c.icon;
           const isSelected = activeCase.id === c.id;
           return (
             <button
               key={c.id}
-              onClick={() => setActiveCase(c)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+              onClick={() => {
+                setActiveCase(c);
+                setCopied(false);
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 isSelected
-                  ? 'bg-white text-black shadow-lg shadow-white/10'
-                  : 'bg-[#131318] text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-700'
+                  ? 'bg-white text-black shadow-md'
+                  : 'bg-[#131318] text-zinc-400 hover:text-white border border-zinc-800'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -95,71 +90,63 @@ export default function UseCasesInteractive() {
         })}
       </div>
 
-      {/* Interactive Transformation Card */}
-      <div className="rounded-2xl border border-zinc-800/90 bg-[#131318]/90 backdrop-blur-xl p-6 sm:p-8 shadow-2xl shadow-black/60">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-          {/* Input Panel */}
+      {/* Interactive Card */}
+      <div className="rounded-2xl border border-zinc-800 bg-[#131318] p-6 sm:p-8 shadow-2xl shadow-black/60">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          {/* User Prompt */}
           <div className="flex flex-col justify-between p-6 rounded-xl bg-black/60 border border-zinc-800/80">
             <div>
-              <div className="flex items-center justify-between text-xs font-mono text-zinc-500 mb-4 pb-2 border-b border-zinc-800/60">
-                <span className="text-violet-400 font-bold">DESKTOP INPUT (CMD+K)</span>
-                <span>{activeCase.role}</span>
+              <div className="text-xs font-mono text-violet-400 font-semibold mb-3">
+                WHAT YOU ASK (CMD + K)
               </div>
-              <div className="text-base sm:text-lg font-medium text-zinc-200 leading-relaxed font-sans">
+              <div className="text-base sm:text-lg text-zinc-200 font-medium leading-relaxed">
                 "{activeCase.input}"
               </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-500 font-mono">
-              <span className="flex items-center gap-1.5 text-emerald-400">
-                <Shield className="w-3.5 h-3.5" /> NeMo Guardrails Sanitized
-              </span>
-              <span className="text-zinc-400">Press ↵ to Execute</span>
+            <div className="mt-6 pt-4 border-t border-zinc-800 text-xs text-zinc-500">
+              {activeCase.persona}
             </div>
           </div>
 
-          {/* Output Panel with Animation */}
+          {/* Assistant Response */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeCase.id}
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 15 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
+              exit={{ opacity: 0, x: -15 }}
+              transition={{ duration: 0.2 }}
               className="flex flex-col justify-between p-6 rounded-xl bg-zinc-900/80 border border-violet-500/30"
             >
               <div>
-                <div className="flex items-center justify-between text-xs font-mono mb-4 pb-2 border-b border-zinc-800/60">
+                <div className="flex items-center justify-between text-xs font-mono mb-3">
                   <span className="text-cyan-400 font-bold">{activeCase.output.tag}</span>
-                  <span className="text-emerald-400 font-bold">{activeCase.output.time}</span>
+                  <span className="text-emerald-400 font-bold">Generated instantly</span>
                 </div>
 
-                <div className="text-sm font-semibold text-white mb-3">
-                  {activeCase.output.summary}
+                <div className="text-xs text-zinc-400 mb-2">
+                  {activeCase.output.preview}
                 </div>
 
-                <div className="p-3.5 rounded-lg bg-black/70 border border-zinc-800 font-mono text-xs text-zinc-300 overflow-x-auto whitespace-pre">
-                  {activeCase.output.codeBlock}
+                <div className="p-3 rounded-lg bg-black/60 border border-zinc-800/80 text-xs text-zinc-300 whitespace-pre-line leading-relaxed mb-3">
+                  {activeCase.output.content}
                 </div>
 
-                <div className="mt-4 space-y-1.5">
-                  <div className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider">
-                    Next Automated Actions:
-                  </div>
-                  {activeCase.output.nextActions.map((action, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-zinc-300">
-                      <CheckCircle className="w-3.5 h-3.5 text-violet-400 flex-shrink-0" />
-                      <span>{action}</span>
-                    </div>
-                  ))}
+                <div className="p-3 rounded-lg bg-violet-950/20 border border-violet-500/30 text-xs text-zinc-200 whitespace-pre-line leading-relaxed font-sans">
+                  {activeCase.output.draft}
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs font-mono text-zinc-400">
-                <span className="flex items-center gap-1.5 text-violet-300">
-                  <Sparkles className="w-3.5 h-3.5" /> Nebius H100 Stream
-                </span>
-                <span className="text-zinc-500">Auto-saved to Memory</span>
+              <div className="mt-4 pt-3 border-t border-zinc-800 flex items-center justify-between">
+                <span className="text-xs text-zinc-400">Ready to use</span>
+                <button
+                  onClick={() => handleCopy(activeCase.output.draft)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-white font-medium transition-colors"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied!' : 'Copy to Clipboard'}</span>
+                </button>
               </div>
             </motion.div>
           </AnimatePresence>
