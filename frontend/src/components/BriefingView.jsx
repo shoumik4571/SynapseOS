@@ -15,72 +15,72 @@ import {
   Sparkles, 
   CheckCircle2, 
   Flag, 
-  Plus,
-  Target,
-  ArrowRight,
-  Edit3,
-  RotateCcw
+  Plus, 
+  Target, 
+  Edit3, 
+  RotateCcw,
+  MessageSquare,
+  ListFilter
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-const PRESETS = [
-  {
-    label: '🚀 Hackathon 5 PM Sprint',
-    schedule: '10:30 AM Standup, 01:00 PM Lunch, 03:00 PM Mentor Sync',
-    deadline: '05:00 PM',
-    tasks: 'Fix token streaming buffer, complete Devpost submission markdown with architecture diagrams, verify live Nebius H100 benchmarks, record 3-min demo video.',
-  },
-  {
-    label: '🎓 Student Due Date 6 PM',
-    schedule: '11:00 AM - 12:30 PM AI Lecture, 02:00 PM TA Office Hours',
-    deadline: '06:00 PM',
-    tasks: 'Derive loss function gradient, train PyTorch model on dataset, plot accuracy curves, write LaTeX report and export PDF.',
-  },
-  {
-    label: '💼 Founder Product Launch',
-    schedule: '09:30 AM Team Sync, 01:00 PM Investor Call, 04:30 PM Customer Advisory Board',
-    deadline: '06:00 PM',
-    tasks: 'Deploy release build to production, verify payment webhook integration, review announcement email draft, publish documentation changelog.',
-  }
-];
+// Format helper
+const getTodayStr = () => new Date().toISOString().split('T')[0];
+const getTomorrowStr = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+};
+const getDay3Str = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 2);
+  return d.toISOString().split('T')[0];
+};
 
-export default function BriefingView({ briefing, onRegenerate, loading: externalLoading, onUpdateMetrics }) {
-  // Try to load saved custom schedule from localStorage
+export default function BriefingView({ onUpdateMetrics }) {
+  const [selectedDate, setSelectedDate] = useState(getTodayStr());
+  const [activeInputMode, setActiveInputMode] = useState('prompt'); // 'prompt' | 'structured'
+  const [naturalPrompt, setNaturalPrompt] = useState('');
+  const [scheduleInput, setScheduleInput] = useState('');
+  const [deadlineInput, setDeadlineInput] = useState('');
+  const [tasksInput, setTasksInput] = useState('');
+  const [attachments, setAttachments] = useState([]);
+  const [structuring, setStructuring] = useState(false);
+  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
+  const [completedTasks, setCompletedTasks] = useState({});
+  const fileInputRef = useRef(null);
+
+  // Load custom schedule for the selected date from localStorage
   const [customSchedule, setCustomSchedule] = useState(() => {
     try {
-      const saved = localStorage.getItem('synapse_custom_schedule');
+      const saved = localStorage.getItem(`synapse_schedule_${getTodayStr()}`);
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
     }
   });
 
-  const [isBuilderOpen, setIsBuilderOpen] = useState(false);
-  const [scheduleInput, setScheduleInput] = useState('');
-  const [deadlineInput, setDeadlineInput] = useState('');
-  const [tasksInput, setTasksInput] = useState('');
-  const [attachments, setAttachments] = useState([]);
-  const [structuring, setStructuring] = useState(false);
-  const [completedTasks, setCompletedTasks] = useState({});
-  const [showPresets, setShowPresets] = useState(false);
-  const fileInputRef = useRef(null);
-
-  // Save custom schedule to localStorage when updated
-  useEffect(() => {
-    if (customSchedule) {
-      try {
-        localStorage.setItem('synapse_custom_schedule', JSON.stringify(customSchedule));
-      } catch (err) {
-        console.error(err);
-      }
+  // Switch date
+  const handleSelectDate = (dateStr) => {
+    setSelectedDate(dateStr);
+    try {
+      const saved = localStorage.getItem(`synapse_schedule_${dateStr}`);
+      setCustomSchedule(saved ? JSON.parse(saved) : null);
+    } catch {
+      setCustomSchedule(null);
     }
-  }, [customSchedule]);
+    setCompletedTasks({});
+    setIsBuilderOpen(false);
+  };
 
-  const handleApplyPreset = (p) => {
-    setScheduleInput(p.schedule);
-    setDeadlineInput(p.deadline);
-    setTasksInput(p.tasks);
-    setShowPresets(false);
+  // Save custom schedule whenever updated for the active date
+  const saveScheduleForDate = (data, dateStr) => {
+    setCustomSchedule(data);
+    try {
+      localStorage.setItem(`synapse_schedule_${dateStr}`, JSON.stringify(data));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleFileUpload = (e) => {
@@ -108,27 +108,36 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
 
   const handleStructureDay = async (e) => {
     e?.preventDefault();
-    if (!tasksInput.trim() && !scheduleInput.trim()) return;
+    if (activeInputMode === 'prompt' && !naturalPrompt.trim()) return;
+    if (activeInputMode === 'structured' && !tasksInput.trim() && !scheduleInput.trim()) return;
     if (structuring) return;
 
     setStructuring(true);
     try {
       const attachmentsSummary = attachments.map(a => `${a.name} (${a.type}, ${a.size})`).join(', ');
-      
+
+      const payload = {
+        target_date: selectedDate,
+        attachments_summary: attachmentsSummary || null
+      };
+
+      if (activeInputMode === 'prompt') {
+        payload.prompt = naturalPrompt;
+      } else {
+        payload.schedule_input = scheduleInput;
+        payload.tasks_detail = tasksInput;
+        payload.deadline = deadlineInput || null;
+      }
+
       const res = await fetch('/api/schedule/structure', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          schedule_input: scheduleInput,
-          tasks_detail: tasksInput,
-          deadline: deadlineInput || null,
-          attachments_summary: attachmentsSummary || null
-        })
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
         const data = await res.json();
-        setCustomSchedule(data);
+        saveScheduleForDate(data, selectedDate);
         setIsBuilderOpen(false);
         setCompletedTasks({});
         if (onUpdateMetrics && data.metrics) {
@@ -150,7 +159,8 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
 
   const handleStartFresh = () => {
     setCustomSchedule(null);
-    localStorage.removeItem('synapse_custom_schedule');
+    localStorage.removeItem(`synapse_schedule_${selectedDate}`);
+    setNaturalPrompt('');
     setScheduleInput('');
     setDeadlineInput('');
     setTasksInput('');
@@ -189,25 +199,44 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
     }
   };
 
-  // If no custom schedule has been built yet AND the builder is not open, show the simple clean welcome card!
+  // 1. Initial State: Clean Welcome Card if no schedule for this date
   if (!customSchedule && !isBuilderOpen) {
     return (
-      <div className="max-w-3xl mx-auto py-8 px-4">
+      <div className="max-w-3xl mx-auto py-6 px-4 space-y-6">
+        {/* Date Selector Tabs (Today, Tomorrow, Day 3) */}
+        <div className="flex items-center justify-center gap-2">
+          {[
+            { label: 'Today', value: getTodayStr() },
+            { label: 'Tomorrow', value: getTomorrowStr() },
+            { label: 'Day 3', value: getDay3Str() },
+          ].map(d => (
+            <button
+              key={d.value}
+              onClick={() => handleSelectDate(d.value)}
+              className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${
+                selectedDate === d.value
+                  ? 'bg-white text-black font-bold shadow-md'
+                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+              }`}
+            >
+              {d.label} ({d.value.slice(5)})
+            </button>
+          ))}
+        </div>
+
+        {/* Welcome Card */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-3xl border border-zinc-800 bg-[#131318] p-8 sm:p-12 text-center shadow-2xl relative overflow-hidden"
         >
-          {/* Subtle soft glow */}
-          <div className="absolute inset-0 bg-radial-gradient from-violet-600/10 via-transparent to-transparent pointer-events-none -z-10" />
-
           <div className="w-14 h-14 rounded-2xl bg-violet-600/10 border border-violet-500/20 text-violet-400 flex items-center justify-center mx-auto mb-5 shadow-inner">
             <Calendar className="w-7 h-7" />
           </div>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 text-xs font-semibold mb-3">
             <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-            MORNING PLANNER
+            MORNING PLANNER • {selectedDate}
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">
@@ -215,10 +244,9 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
           </h2>
 
           <p className="mt-3 text-sm text-zinc-400 max-w-lg mx-auto leading-relaxed">
-            Give Synapse your schedule, tasks, and deadlines. It will calculate an hour-by-hour timeline and prioritize what you should focus on today.
+            Give Synapse a quick prompt describing your day, or enter your fixed times & deadlines. It will calculate an hour-by-hour timeline and prioritize what to focus on.
           </p>
 
-          {/* Simple Clean Primary Button */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <motion.button
               onClick={() => setIsBuilderOpen(true)}
@@ -230,28 +258,36 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
               <span>Build Your Schedule</span>
             </motion.button>
           </div>
-
-          {/* Optional helper for judges */}
-          <div className="mt-8 pt-6 border-t border-zinc-850">
-            <button
-              onClick={() => {
-                handleApplyPreset(PRESETS[0]);
-                setIsBuilderOpen(true);
-              }}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-4"
-            >
-              Or try with an example scenario (Hackathon 5 PM Sprint)
-            </button>
-          </div>
         </motion.div>
       </div>
     );
   }
 
-  // Builder Modal / Form State
+  // 2. Builder Mode: Allows Natural Language Prompt OR Structured Fields!
   if (isBuilderOpen) {
     return (
-      <div className="max-w-3xl mx-auto py-4 px-4">
+      <div className="max-w-3xl mx-auto py-4 px-4 space-y-4">
+        {/* Date Selector */}
+        <div className="flex items-center justify-center gap-2 mb-2">
+          {[
+            { label: 'Today', value: getTodayStr() },
+            { label: 'Tomorrow', value: getTomorrowStr() },
+            { label: 'Day 3', value: getDay3Str() },
+          ].map(d => (
+            <button
+              key={d.value}
+              onClick={() => handleSelectDate(d.value)}
+              className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${
+                selectedDate === d.value
+                  ? 'bg-white text-black font-bold shadow-md'
+                  : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+              }`}
+            >
+              {d.label} ({d.value.slice(5)})
+            </button>
+          ))}
+        </div>
+
         <motion.form
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -263,10 +299,10 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
             <div>
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-violet-400" />
-                <h3 className="text-base sm:text-lg font-bold text-white">Build Your Day Schedule</h3>
+                <h3 className="text-base sm:text-lg font-bold text-white">Plan Schedule for {selectedDate}</h3>
               </div>
               <p className="text-xs text-zinc-400 mt-0.5">
-                Tell Synapse what you need to do, and it will structure your entire day.
+                Powered by NVIDIA Nemotron-3.5 on Nebius Token Factory
               </p>
             </div>
 
@@ -281,109 +317,116 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
             )}
           </div>
 
-          {/* Quick Presets Toggle */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-zinc-400">Want to test quickly?</span>
-              <button
-                type="button"
-                onClick={() => setShowPresets(!showPresets)}
-                className="text-xs text-violet-400 hover:text-violet-300 underline"
-              >
-                {showPresets ? "Hide Example Scenarios" : "Load an Example Scenario"}
-              </button>
-            </div>
-
-            {showPresets && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 rounded-2xl bg-zinc-950 border border-zinc-850">
-                {PRESETS.map((p, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleApplyPreset(p)}
-                    className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 text-left text-xs font-medium transition-all"
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Mode Selector: Natural Language Prompt vs Structured Fields */}
+          <div className="flex items-center justify-center p-1 bg-black rounded-xl border border-zinc-800 max-w-sm mx-auto">
+            <button
+              type="button"
+              onClick={() => setActiveInputMode('prompt')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all ${
+                activeInputMode === 'prompt'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Prompt the AI (Natural)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveInputMode('structured')}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all ${
+                activeInputMode === 'structured'
+                  ? 'bg-white text-black shadow-md'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              <ListFilter className="w-3.5 h-3.5" />
+              <span>Structured Fields</span>
+            </button>
           </div>
 
-          {/* Step 1: Schedule & Timestamps */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                1. Your Schedule & Fixed Times (Optional)
-              </span>
-              <span className="text-[10px] text-zinc-500 font-mono">e.g. Meetings, classes</span>
-            </label>
-            <input
-              type="text"
-              value={scheduleInput}
-              onChange={(e) => setScheduleInput(e.target.value)}
-              placeholder="e.g. 10:30 AM Team Sync, 01:00 PM Lunch, 03:30 PM Client Call"
-              className="w-full bg-black/80 border border-zinc-800 focus:border-violet-500 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
-            />
-          </div>
-
-          {/* Step 2: Deadline */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Flag className="w-3.5 h-3.5 text-rose-400" />
-                2. Hard Deadline (Optional)
-              </span>
-              <span className="text-[10px] text-rose-400 font-mono">Cutoff time</span>
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={deadlineInput}
-                onChange={(e) => setDeadlineInput(e.target.value)}
-                placeholder="e.g. 05:00 PM"
-                className="flex-1 bg-black/80 border border-zinc-800 focus:border-rose-500 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+          {/* Mode 1: Natural Language Prompt */}
+          {activeInputMode === 'prompt' && (
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
+                <span>Describe your day naturally in one prompt:</span>
+                <span className="text-[10px] text-violet-400 font-mono">Nemotron AI Extraction</span>
+              </label>
+              <textarea
+                rows={5}
+                value={naturalPrompt}
+                onChange={(e) => setNaturalPrompt(e.target.value)}
+                placeholder="e.g. Tomorrow I have a 10:30 AM standup and a 2:00 PM mentor sync. I have a hard deadline at 5:00 PM to submit my project. I need to fix the backend token streaming bug, finish the documentation, and record a 3-minute video. Please structure my day with safety buffer."
+                className="w-full bg-black/80 border border-zinc-800 focus:border-violet-500 rounded-xl p-3.5 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all resize-none shadow-inner leading-relaxed"
               />
-              <div className="flex gap-1.5">
-                {['05:00 PM', '06:00 PM', '11:59 PM'].map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setDeadlineInput(d)}
-                    className="px-2.5 py-1 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-xs text-zinc-400 hover:text-white"
-                  >
-                    {d}
-                  </button>
-                ))}
+              <p className="text-[11px] text-zinc-500">
+                Tip: You can mention meetings, deadlines, and tasks in any order. The AI extracts timestamps and balances your time automatically.
+              </p>
+            </div>
+          )}
+
+          {/* Mode 2: Structured Fields */}
+          {activeInputMode === 'structured' && (
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                    Fixed Times & Schedule
+                  </span>
+                  <span className="text-[10px] text-zinc-500 font-mono">e.g. 10:30 AM Standup</span>
+                </label>
+                <input
+                  type="text"
+                  value={scheduleInput}
+                  onChange={(e) => setScheduleInput(e.target.value)}
+                  placeholder="e.g. 10:30 AM Standup, 01:00 PM Lunch"
+                  className="w-full bg-black/80 border border-zinc-800 focus:border-violet-500 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Flag className="w-3.5 h-3.5 text-rose-400" />
+                    Hard Deadline
+                  </span>
+                  <span className="text-[10px] text-rose-400 font-mono">Target cutoff</span>
+                </label>
+                <input
+                  type="text"
+                  value={deadlineInput}
+                  onChange={(e) => setDeadlineInput(e.target.value)}
+                  placeholder="e.g. 05:00 PM"
+                  className="w-full bg-black/80 border border-zinc-800 focus:border-rose-500 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all shadow-inner"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-violet-400" />
+                    What do you need to get done?
+                  </span>
+                  <span className="text-[10px] text-zinc-500 font-mono">Detailed tasks</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={tasksInput}
+                  onChange={(e) => setTasksInput(e.target.value)}
+                  placeholder="e.g. Finish API integration, write lab report, prepare presentation..."
+                  className="w-full bg-black/80 border border-zinc-800 focus:border-violet-500 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all resize-none shadow-inner"
+                />
               </div>
             </div>
-          </div>
+          )}
 
-          {/* Step 3: Explain Tasks in Detail */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-200 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-violet-400" />
-                3. What do you need to get done today? (Required)
-              </span>
-              <span className="text-[10px] text-zinc-500 font-mono">Task details</span>
-            </label>
-            <textarea
-              rows={4}
-              value={tasksInput}
-              onChange={(e) => setTasksInput(e.target.value)}
-              placeholder="Explain your work and tasks in detail... (e.g. 'I have to finish the backend API, write documentation, review PR #12, and prepare the demo slides')"
-              className="w-full bg-black/80 border border-zinc-800 focus:border-violet-500 rounded-xl p-3 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all resize-none shadow-inner"
-            />
-          </div>
-
-          {/* Step 4: Attach Files or Images */}
-          <div className="space-y-2">
+          {/* Attachments Section */}
+          <div className="space-y-2 pt-2 border-t border-zinc-850">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-zinc-200 flex items-center gap-1.5">
                 <ImageIcon className="w-3.5 h-3.5 text-emerald-400" />
-                4. Attach Images or Files (Optional)
+                Attach Images or Files (Optional)
               </label>
               <span className="text-[10px] text-zinc-500 font-mono">Screenshots, Notes, PDFs</span>
             </div>
@@ -450,7 +493,11 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
 
             <motion.button
               type="submit"
-              disabled={structuring || (!tasksInput.trim() && !scheduleInput.trim())}
+              disabled={
+                structuring || 
+                (activeInputMode === 'prompt' && !naturalPrompt.trim()) ||
+                (activeInputMode === 'structured' && !tasksInput.trim() && !scheduleInput.trim())
+              }
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-black hover:bg-zinc-200 font-bold text-xs shadow-lg shadow-white/10 disabled:opacity-40 transition-colors"
@@ -464,7 +511,7 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
     );
   }
 
-  // Active Output View: Displaying User's Own Structured Schedule!
+  // 3. Active Output View: Displays Real Output for the selected date!
   const scheduleData = customSchedule.schedule;
   const timeBlocks = scheduleData?.time_blocks || [];
   const mustDoToday = scheduleData?.must_do_today || [];
@@ -475,6 +522,27 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Date Switcher */}
+      <div className="flex items-center justify-center gap-2">
+        {[
+          { label: 'Today', value: getTodayStr() },
+          { label: 'Tomorrow', value: getTomorrowStr() },
+          { label: 'Day 3', value: getDay3Str() },
+        ].map(d => (
+          <button
+            key={d.value}
+            onClick={() => handleSelectDate(d.value)}
+            className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all ${
+              selectedDate === d.value
+                ? 'bg-white text-black font-bold shadow-md'
+                : 'bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800'
+            }`}
+          >
+            {d.label} ({d.value.slice(5)})
+          </button>
+        ))}
+      </div>
+
       {/* Top Banner with Action Buttons */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
@@ -484,7 +552,7 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
             <Calendar className="w-3.5 h-3.5 text-violet-400" />
-            <span>YOUR STRUCTURED DAY • {customSchedule.date || "TODAY"}</span>
+            <span>SCHEDULE FOR {selectedDate}</span>
           </div>
           <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
             <span>Execution Timeline</span>
@@ -513,7 +581,7 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
             onClick={handleStartFresh}
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            title="Start fresh with a new day"
+            title="Start fresh with a new plan"
             className="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -521,7 +589,7 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
         </div>
       </motion.div>
 
-      {/* Deadline Assessment Banner (Only if a deadline was set) */}
+      {/* Deadline Assessment Banner */}
       {deadlineAssessment && (
         <motion.div 
           whileHover={{ scale: 1.01 }}
@@ -552,9 +620,9 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
         </motion.div>
       )}
 
-      {/* The Two Main Columns: Timeline & Priorities */}
+      {/* Two Columns: Timeline & Checklist */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Hour-by-Hour Timeline */}
+        {/* Timeline */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between text-xs font-mono px-1">
             <span className="text-zinc-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
@@ -603,9 +671,8 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
           </div>
         </div>
 
-        {/* Right Column: Must Do Today & Can Wait */}
+        {/* Priority Checklist */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Priority Checklist */}
           <div className="p-5 rounded-2xl bg-[#131318] border border-zinc-800 space-y-4 shadow-md">
             <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
               <span className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
@@ -659,7 +726,7 @@ export default function BriefingView({ briefing, onRegenerate, loading: external
             </div>
           </div>
 
-          {/* Can Wait or Defer Section */}
+          {/* Can Wait Section */}
           {canWait && canWait.length > 0 && (
             <div className="p-5 rounded-2xl bg-[#131318] border border-zinc-800 space-y-3 shadow-md">
               <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-300 uppercase tracking-wider">

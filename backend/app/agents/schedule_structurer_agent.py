@@ -1,7 +1,8 @@
 """
 Schedule & Day Structurer Agent for Synapse.
-Analyzes timestamps, fixed commitments, hard deadlines, detailed task descriptions,
-and attached files/images to synthesize an optimal hour-by-hour execution schedule.
+Analyzes natural language prompts, timestamps, fixed commitments, hard deadlines,
+detailed task descriptions, and attached files/images to synthesize an optimal
+hour-by-hour execution schedule.
 """
 
 import json
@@ -11,13 +12,14 @@ from app.memory_store import memory_store
 from app.nebius_client import nebius_client
 
 SCHEDULE_SYSTEM_PROMPT = """You are Synapse, an elite Executive Chief of Staff and Intelligent Day Structurer.
-Your mission is to take the user's raw daily commitments, fixed time blocks/timestamps, hard deadlines, task details, and any attached context, and structure their day into a realistic, low-friction, high-impact execution plan.
+Your mission is to take the user's natural language schedule prompt, raw commitments, fixed time blocks/timestamps, hard deadlines, task details, and any attached context, and structure their day into a realistic, low-friction, high-impact execution plan.
 
 CRITICAL RULES:
-1. RESPECT FIXED TIMESTAMPS: Protect user meetings and scheduled events exactly at their times.
-2. DEADLINE-BACKED SCHEDULING: If a deadline exists (e.g. 5:00 PM), schedule the most critical work BEFORE the deadline with at least 45-60 minutes of safety buffer.
-3. ENERGY-AWARE TIME BLOCKS: Deep work should happen in uninterrupted 60-90 min blocks.
-4. BE DECISIVE: Clearly categorize what MUST be done today vs what CAN WAIT if time runs out.
+1. PARSE NATURAL PROMPTS INTELLIGENTLY: If the user provides a freeform natural language prompt (e.g. "I have a meeting at 10 AM and lunch at 1 PM, need to finish the API by 5 PM"), automatically extract all commitments, deadlines, and deliverables.
+2. RESPECT FIXED TIMESTAMPS: Protect user meetings and scheduled events exactly at their times.
+3. DEADLINE-BACKED SCHEDULING: If a deadline exists (e.g. 5:00 PM), schedule the most critical work BEFORE the deadline with at least 45-60 minutes of safety buffer.
+4. ENERGY-AWARE TIME BLOCKS: Deep work should happen in uninterrupted 60-90 min blocks.
+5. BE DECISIVE: Clearly categorize what MUST be done today vs what CAN WAIT if time runs out.
 
 Return strictly valid JSON with this exact schema (no markdown formatting, no conversational text):
 {
@@ -58,27 +60,45 @@ Return strictly valid JSON with this exact schema (no markdown formatting, no co
 class ScheduleStructurerAgent:
     async def structure_day(
         self,
-        schedule_input: str,
-        tasks_detail: str,
+        prompt: Optional[str] = None,
+        schedule_input: Optional[str] = None,
+        tasks_detail: Optional[str] = None,
         deadline: Optional[str] = None,
-        attachments_summary: Optional[str] = None
+        attachments_summary: Optional[str] = None,
+        target_date: Optional[str] = None
     ) -> Dict[str, Any]:
         """Prompts NVIDIA Nemotron on Nebius Token Factory to synthesize a structured day."""
         current_time_str = datetime.now().strftime('%Y-%m-%d %I:%M %p')
+        date_str = target_date or datetime.now().strftime('%Y-%m-%d')
         
-        user_prompt = f"""Current Date & Time: {current_time_str}
+        prompt_block = ""
+        if prompt and prompt.strip():
+            prompt_block = f"USER'S NATURAL LANGUAGE PROMPT & INSTRUCTIONS:\n{prompt.strip()}\n\n"
 
-USER'S SCHEDULE & FIXED TIMESTAMPS:
-{schedule_input.strip() if schedule_input else "No fixed meetings provided; full day available for focused work."}
+        schedule_block = ""
+        if schedule_input and schedule_input.strip():
+            schedule_block = f"USER'S FIXED SCHEDULE & TIMESTAMPS:\n{schedule_input.strip()}\n\n"
 
-DEADLINE:
-{deadline.strip() if deadline else "No hard cutoff specified today."}
+        deadline_block = ""
+        if deadline and deadline.strip():
+            deadline_block = f"TARGET DEADLINE:\n{deadline.strip()}\n\n"
 
-DETAILED TASKS & WORK DESCRIPTION:
-{tasks_detail.strip() if tasks_detail else "General focus on advancing key project milestones."}
+        tasks_block = ""
+        if tasks_detail and tasks_detail.strip():
+            tasks_block = f"DETAILED TASKS & WORK DESCRIPTION:\n{tasks_detail.strip()}\n\n"
 
-ATTACHED DOCUMENTS / IMAGES CONTEXT:
-{attachments_summary.strip() if attachments_summary else "No attachments."}
+        attachments_block = ""
+        if attachments_summary and attachments_summary.strip():
+            attachments_block = f"ATTACHED DOCUMENTS / IMAGES CONTEXT:\n{attachments_summary.strip()}\n\n"
+
+        combined_input = prompt_block + schedule_block + deadline_block + tasks_block + attachments_block
+        if not combined_input.strip():
+            combined_input = "Plan a productive day with focused deep work blocks and balanced rest."
+
+        user_prompt = f"""Planning Date: {date_str} (Reference Time: {current_time_str})
+
+INPUTS:
+{combined_input}
 
 Synthesize the optimal hour-by-hour structured day JSON now:"""
 
@@ -95,10 +115,8 @@ Synthesize the optimal hour-by-hour structured day JSON now:"""
             elif chunk["type"] == "metrics":
                 metrics = chunk["data"]
 
-        parsed = self._extract_json(full_response, schedule_input, tasks_detail, deadline)
+        parsed = self._extract_json(full_response, schedule_input or prompt or "", tasks_detail or prompt or "", deadline)
         
-        # Save structured priorities into memory store so it syncs with briefing
-        date_str = datetime.now().strftime('%Y-%m-%d')
         priorities_list = [f"{item['task']} ({item.get('block_assigned', 'Today')})" for item in parsed.get("must_do_today", [])[:4]]
         if priorities_list:
             memory_store.save_briefing(

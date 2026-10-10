@@ -70,10 +70,12 @@ class GoalDecomposeRequest(BaseModel):
     target_date: Optional[str] = ""
 
 class ScheduleStructureRequest(BaseModel):
-    schedule_input: str
-    tasks_detail: str
+    prompt: Optional[str] = None
+    schedule_input: Optional[str] = ""
+    tasks_detail: Optional[str] = ""
     deadline: Optional[str] = None
     attachments_summary: Optional[str] = None
+    target_date: Optional[str] = None
 
 class VerifyKeyRequest(BaseModel):
     api_key: str
@@ -130,10 +132,12 @@ async def get_latest_briefing():
 @app.post("/api/schedule/structure")
 async def structure_schedule(req: ScheduleStructureRequest):
     result = await schedule_structurer.structure_day(
+        prompt=req.prompt,
         schedule_input=req.schedule_input,
         tasks_detail=req.tasks_detail,
         deadline=req.deadline,
-        attachments_summary=req.attachments_summary
+        attachments_summary=req.attachments_summary,
+        target_date=req.target_date
     )
     return result
 
