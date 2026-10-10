@@ -1,26 +1,17 @@
 import React, { useState } from 'react';
 import Navbar from './components/landing/Navbar';
 import HeroSection from './components/landing/HeroSection';
-import ProductMockup from './components/landing/ProductMockup';
 import FeaturesGrid from './components/landing/FeaturesGrid';
-import FormFactorsSection from './components/landing/FormFactorsSection';
-import ActivityMonitorSimulator from './components/landing/ActivityMonitorSimulator';
-import TavilyShowcaseSection from './components/landing/TavilyShowcaseSection';
+import LiveDemoSection from './components/landing/LiveDemoSection';
 import HowItWorks from './components/landing/HowItWorks';
-import UseCasesInteractive from './components/landing/UseCasesInteractive';
-import CompatibilitySection from './components/landing/CompatibilitySection';
-import TestimonialsSection from './components/landing/TestimonialsSection';
-import FAQSection from './components/landing/FAQSection';
-import ContactSection from './components/landing/ContactSection';
-import FinalCTA from './components/landing/FinalCTA';
-import Footer from './components/landing/Footer';
+import SimpleDownloadSection from './components/landing/SimpleDownloadSection';
+import SimpleFAQ from './components/landing/SimpleFAQ';
+import SimpleFooter from './components/landing/SimpleFooter';
 import DownloadModal from './components/landing/DownloadModal';
-import LiveWorkspaceModal from './components/landing/LiveWorkspaceModal';
 
 export default function App() {
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [downloadPlatform, setDownloadPlatform] = useState('mac');
-  const [liveWorkspaceOpen, setLiveWorkspaceOpen] = useState(false);
 
   const handleOpenDownload = (platform = 'mac') => {
     setDownloadPlatform(platform);
@@ -29,82 +20,38 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-[#09090B] text-neutral-100 font-sans selection:bg-violet-500 selection:text-white overflow-x-hidden">
-      {/* Background ambient lighting */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(139,92,246,0.12),rgba(0,0,0,0))] pointer-events-none -z-10" />
+      {/* Background soft glow */}
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(139,92,246,0.1),rgba(0,0,0,0))] pointer-events-none -z-10" />
 
-      {/* 1. Navigation Bar */}
-      <Navbar
-        onOpenDownload={handleOpenDownload}
-        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
-      />
+      {/* 1. Simple Navbar */}
+      <Navbar onOpenDownload={handleOpenDownload} />
 
-      {/* 2. Hero Section: SynapseOS Desktop & Browser Introduction */}
-      <HeroSection
-        onOpenDownload={handleOpenDownload}
-        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
-      />
+      {/* 2. Simple Hero Section */}
+      <HeroSection onOpenDownload={handleOpenDownload} />
 
-      {/* 3. Interactive Desktop Application Preview */}
-      <ProductMockup />
-
-      {/* 4. Section 1: Features Showcase (Section by Section) */}
+      {/* 3. Four Core Features */}
       <FeaturesGrid />
 
-      {/* 5. Section 2: Two Form Factors (Desktop App vs Browser Extension) */}
-      <FormFactorsSection
-        onOpenDownload={handleOpenDownload}
-        onOpenExtension={() => handleOpenDownload('ext')}
-      />
+      {/* 4. Live Interactive Demo Widget (Try it right here on the page!) */}
+      <LiveDemoSection />
 
-      {/* 6. Section 3: Live Activity Watcher Simulator (Answers: How does it monitor tasks?) */}
-      <ActivityMonitorSimulator />
-
-      {/* 7. Section 4: Deep Tavily Live Fact-Checking Showcase */}
-      <TavilyShowcaseSection />
-
-      {/* 8. Section 5: How It Works Stepwise Guide */}
+      {/* 5. How It Works (3 Simple Steps) */}
       <HowItWorks />
 
-      {/* 9. Section 6: Practical Everyday Use Cases */}
-      <UseCasesInteractive />
+      {/* 6. Simple Download Section (Mac, Windows, Chrome) */}
+      <SimpleDownloadSection onOpenDownload={handleOpenDownload} />
 
-      {/* 10. Section 7: Native Downloads & Browser Compatibility */}
-      <CompatibilitySection
-        onOpenDownload={handleOpenDownload}
-      />
+      {/* 7. Questions & Answers */}
+      <SimpleFAQ />
 
-      {/* 11. Social Proof & Testimonials */}
-      <TestimonialsSection />
+      {/* 8. Footer */}
+      <SimpleFooter />
 
-      {/* 12. Frequently Asked Questions */}
-      <FAQSection />
-
-      {/* 13. Contact & Feedback */}
-      <ContactSection />
-
-      {/* 14. Final Closing Call to Action */}
-      <FinalCTA
-        onOpenDownload={handleOpenDownload}
-        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
-      />
-
-      {/* 15. Comprehensive Footer */}
-      <Footer
-        onOpenDownload={handleOpenDownload}
-        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
-      />
-
-      {/* Multi-Platform Download Modal (.dmg, .exe, extension) */}
+      {/* Direct Download Modal (.dmg, .exe, .zip) */}
       <DownloadModal
         isOpen={downloadModalOpen}
         onClose={() => setDownloadModalOpen(false)}
         defaultPlatform={downloadPlatform}
-      />
-
-      {/* In-Browser Live Interactive Workspace Modal (Instant Test Drive for Judges) */}
-      <LiveWorkspaceModal
-        isOpen={liveWorkspaceOpen}
-        onClose={() => setLiveWorkspaceOpen(false)}
       />
     </div>
   );
