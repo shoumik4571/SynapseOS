@@ -4,6 +4,7 @@ import HeroSection from './components/landing/HeroSection';
 import ProductMockup from './components/landing/ProductMockup';
 import FeaturesGrid from './components/landing/FeaturesGrid';
 import FormFactorsSection from './components/landing/FormFactorsSection';
+import ActivityMonitorSimulator from './components/landing/ActivityMonitorSimulator';
 import TavilyShowcaseSection from './components/landing/TavilyShowcaseSection';
 import HowItWorks from './components/landing/HowItWorks';
 import UseCasesInteractive from './components/landing/UseCasesInteractive';
@@ -55,36 +56,39 @@ export default function App() {
         onOpenExtension={() => handleOpenDownload('ext')}
       />
 
-      {/* 6. Section 3: Deep Tavily Live Fact-Checking Showcase */}
+      {/* 6. Section 3: Live Activity Watcher Simulator (Answers: How does it monitor tasks?) */}
+      <ActivityMonitorSimulator />
+
+      {/* 7. Section 4: Deep Tavily Live Fact-Checking Showcase */}
       <TavilyShowcaseSection />
 
-      {/* 7. Section 4: How It Works Stepwise Guide */}
+      {/* 8. Section 5: How It Works Stepwise Guide */}
       <HowItWorks />
 
-      {/* 8. Section 5: Practical Everyday Use Cases */}
+      {/* 9. Section 6: Practical Everyday Use Cases */}
       <UseCasesInteractive />
 
-      {/* 9. Section 6: Native Downloads & Browser Compatibility */}
+      {/* 10. Section 7: Native Downloads & Browser Compatibility */}
       <CompatibilitySection
         onOpenDownload={handleOpenDownload}
       />
 
-      {/* 10. Social Proof & Testimonials */}
+      {/* 11. Social Proof & Testimonials */}
       <TestimonialsSection />
 
-      {/* 11. Frequently Asked Questions */}
+      {/* 12. Frequently Asked Questions */}
       <FAQSection />
 
-      {/* 12. Contact & Feedback */}
+      {/* 13. Contact & Feedback */}
       <ContactSection />
 
-      {/* 13. Final Closing Call to Action */}
+      {/* 14. Final Closing Call to Action */}
       <FinalCTA
         onOpenDownload={handleOpenDownload}
         onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* 14. Comprehensive Footer */}
+      {/* 15. Comprehensive Footer */}
       <Footer
         onOpenDownload={handleOpenDownload}
         onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
