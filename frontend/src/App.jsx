@@ -3,7 +3,8 @@ import Navbar from './components/landing/Navbar';
 import HeroSection from './components/landing/HeroSection';
 import ProductMockup from './components/landing/ProductMockup';
 import FeaturesGrid from './components/landing/FeaturesGrid';
-import ProFeatureTrial from './components/landing/ProFeatureTrial';
+import FormFactorsSection from './components/landing/FormFactorsSection';
+import TavilyShowcaseSection from './components/landing/TavilyShowcaseSection';
 import HowItWorks from './components/landing/HowItWorks';
 import UseCasesInteractive from './components/landing/UseCasesInteractive';
 import CompatibilitySection from './components/landing/CompatibilitySection';
@@ -32,11 +33,11 @@ export default function App() {
 
       {/* 1. Navigation Bar */}
       <Navbar
-        onOpenDownload={() => handleOpenDownload('mac')}
+        onOpenDownload={handleOpenDownload}
         onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* 2. Hero Section: SynapseOS AI Assistant Introduction */}
+      {/* 2. Hero Section: SynapseOS Desktop & Browser Introduction */}
       <HeroSection
         onOpenDownload={handleOpenDownload}
         onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
@@ -48,51 +49,55 @@ export default function App() {
       {/* 4. Section 1: Features Showcase (Section by Section) */}
       <FeaturesGrid />
 
-      {/* 5. Section 2: Flagship Proactive Deep Flow Feature (Trial) */}
-      <ProFeatureTrial
-        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
+      {/* 5. Section 2: Two Form Factors (Desktop App vs Browser Extension) */}
+      <FormFactorsSection
+        onOpenDownload={handleOpenDownload}
+        onOpenExtension={() => handleOpenDownload('ext')}
       />
 
-      {/* 6. Section 3: How It Works Stepwise Guide */}
+      {/* 6. Section 3: Deep Tavily Live Fact-Checking Showcase */}
+      <TavilyShowcaseSection />
+
+      {/* 7. Section 4: How It Works Stepwise Guide */}
       <HowItWorks />
 
-      {/* 7. Section 4: Practical Everyday Use Cases */}
+      {/* 8. Section 5: Practical Everyday Use Cases */}
       <UseCasesInteractive />
 
-      {/* 8. Section 5: Native Downloads for Mac & PC */}
+      {/* 9. Section 6: Native Downloads & Browser Compatibility */}
       <CompatibilitySection
         onOpenDownload={handleOpenDownload}
       />
 
-      {/* 9. Social Proof & Testimonials */}
+      {/* 10. Social Proof & Testimonials */}
       <TestimonialsSection />
 
-      {/* 10. Frequently Asked Questions */}
+      {/* 11. Frequently Asked Questions */}
       <FAQSection />
 
-      {/* 11. Contact & Feedback */}
+      {/* 12. Contact & Feedback */}
       <ContactSection />
 
-      {/* 12. Final Closing Call to Action */}
+      {/* 13. Final Closing Call to Action */}
       <FinalCTA
         onOpenDownload={handleOpenDownload}
         onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* 13. Comprehensive Footer */}
+      {/* 14. Comprehensive Footer */}
       <Footer
         onOpenDownload={handleOpenDownload}
         onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* Native Desktop App Download Modal (.dmg & .exe) */}
+      {/* Multi-Platform Download Modal (.dmg, .exe, extension) */}
       <DownloadModal
         isOpen={downloadModalOpen}
         onClose={() => setDownloadModalOpen(false)}
         defaultPlatform={downloadPlatform}
       />
 
-      {/* In-Browser Live Interactive Workspace Modal (for Instant Test Drive) */}
+      {/* In-Browser Live Interactive Workspace Modal (Instant Test Drive for Judges) */}
       <LiveWorkspaceModal
         isOpen={liveWorkspaceOpen}
         onClose={() => setLiveWorkspaceOpen(false)}

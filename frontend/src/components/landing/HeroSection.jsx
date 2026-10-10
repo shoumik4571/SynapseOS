@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Apple, Monitor, Sparkles, ArrowRight, ShieldCheck, Globe, Zap, Command } from 'lucide-react';
+import { Apple, Monitor, Chrome, Sparkles, ArrowRight, ShieldCheck, Globe, Zap, Command, Laptop } from 'lucide-react';
 
 export default function HeroSection({ onOpenDownload, onOpenLiveDemo }) {
   return (
@@ -41,7 +41,7 @@ export default function HeroSection({ onOpenDownload, onOpenLiveDemo }) {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-purple-300 to-cyan-400">
             The Personal AI Assistant
           </span>{' '}
-          for Your Desktop.
+          for Your Desktop & Browser.
         </motion.h1>
 
         {/* Clear Relatable Description */}
@@ -51,7 +51,7 @@ export default function HeroSection({ onOpenDownload, onOpenLiveDemo }) {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-6 text-base sm:text-xl text-zinc-300 max-w-2xl mx-auto font-sans leading-relaxed"
         >
-          SynapseOS wakes up before you do to organize your morning, answers questions with live web facts via Tavily, drafts your messages, and remembers what you read—instantly available on macOS and Windows.
+          Available as a <strong>background native desktop app</strong> for complete cross-application productivity, or as a <strong>browser extension</strong> for active tab intelligence and real-time fact-checking via Tavily.
         </motion.p>
 
         {/* Action Buttons */}
@@ -61,22 +61,28 @@ export default function HeroSection({ onOpenDownload, onOpenLiveDemo }) {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
         >
-          {/* macOS Download */}
+          {/* Desktop App */}
           <button
             onClick={() => onOpenDownload('mac')}
             className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-white text-black hover:bg-neutral-200 active:scale-95 transition-all font-semibold text-sm shadow-xl shadow-white/10"
           >
-            <Apple className="w-4 h-4 fill-current" />
-            <span>Download for Mac (.dmg)</span>
+            <Laptop className="w-4 h-4 fill-current" />
+            <div className="text-left">
+              <div className="leading-none text-[10px] text-neutral-600 font-medium">macOS & Windows</div>
+              <div className="leading-tight text-sm font-bold">Download Desktop App</div>
+            </div>
           </button>
 
-          {/* Windows Download */}
+          {/* Browser Extension */}
           <button
-            onClick={() => onOpenDownload('win')}
-            className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#131318] text-white border border-zinc-700/80 hover:border-zinc-500 hover:bg-zinc-900 active:scale-95 transition-all font-semibold text-sm shadow-md"
+            onClick={() => onOpenDownload('ext')}
+            className="flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#131318] text-white border border-zinc-700/80 hover:border-cyan-500/60 hover:bg-zinc-900 active:scale-95 transition-all font-semibold text-sm shadow-md"
           >
-            <Monitor className="w-4 h-4 text-cyan-400" />
-            <span>Download for Windows (.exe)</span>
+            <Chrome className="w-4 h-4 text-cyan-400" />
+            <div className="text-left">
+              <div className="leading-none text-[10px] text-zinc-400 font-medium">Chrome / Arc / Edge</div>
+              <div className="leading-tight text-sm font-bold">Add Browser Extension</div>
+            </div>
           </button>
 
           {/* Try in Browser */}
@@ -85,7 +91,7 @@ export default function HeroSection({ onOpenDownload, onOpenLiveDemo }) {
             className="flex items-center gap-2 px-5 py-3.5 rounded-xl bg-violet-600/20 text-violet-200 border border-violet-500/40 hover:bg-violet-600/30 hover:text-white transition-all text-sm font-semibold"
           >
             <Sparkles className="w-4 h-4 text-violet-400" />
-            <span>Test Live in Browser</span>
+            <span>Test Drive Live</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </motion.div>
@@ -103,11 +109,11 @@ export default function HeroSection({ onOpenDownload, onOpenLiveDemo }) {
           </div>
           <div className="flex items-center gap-1.5">
             <Globe className="w-3.5 h-3.5 text-pink-400" />
-            <span>Live Web Facts via Tavily</span>
+            <span>Deep Tavily Fact Verification</span>
           </div>
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>On-Device Privacy Guaranteed</span>
+            <span>100% Free & Open-Source</span>
           </div>
         </motion.div>
       </div>
