@@ -1,15 +1,15 @@
 import React, { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
-import { Award, Target, Compass, MessageSquare, Gauge, ArrowLeftRight, Database } from 'lucide-react';
+import { Target, Compass, MessageSquare, Gauge, ArrowLeftRight, Database, Award } from 'lucide-react';
 
 const TABS = [
-  { id: 'guide', label: '🏆 Hackathon Guide & Rubric', icon: Award },
   { id: 'briefing', label: 'Executive Briefing', icon: Target },
   { id: 'goals', label: 'Goal Engine', icon: Compass },
   { id: 'chat', label: 'Thought Partner', icon: MessageSquare },
-  { id: 'benchmark', label: 'H100 Benchmark', icon: Gauge },
+  { id: 'benchmark', label: 'H100 Speedometer', icon: Gauge },
   { id: 'diff', label: 'Context Diff', icon: ArrowLeftRight },
   { id: 'memory', label: 'Memory & Watcher', icon: Database },
+  { id: 'guide', label: 'Interactive Tour', icon: Award },
 ];
 
 function DockItem({ mouseX, tab, isActive, onClick }) {

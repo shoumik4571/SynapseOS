@@ -10,11 +10,12 @@
 
 ---
 
-## 🏆 Hackathon Prize Targets
+## 🏆 Hackathon Focus & Architecture Highlights
 
-- 🥇 **Grand Prize ($20,000 Cash)**: End-to-end autonomous ambient copilot with flow preservation.
-- 🤖 **Personal AI Track Award (NVIDIA Jetson Orin Nano)**: Autonomous Goal Engine, local NeMo privacy guardrails, and ambient slide-in HUD.
-- 🔎 **Best Use of Tavily ($3,000 Cash Prize)**: Deep real-time web research & fact verification fused with local workspace context.
+- 🤖 **Track 2: Personal AI**: Autonomous desktop OS copilot with ambient context, daily executive briefings, and local SQLite memory graph.
+- ⚡ **High-Throughput Inference**: 165+ tok/s streaming powered by `nvidia/Nemotron-3_5-Lightning` on Nebius Token Factory H100 SXM5 clusters.
+- 🛡️ **Client-Side Privacy**: NVIDIA NeMo Guardrails on-device PII and credential scrubbing firewall.
+- 🔎 **Real-Time Web Grounding**: Deep technical search and citation verification powered by Tavily AI Search API.
 
 ---
 

@@ -17,7 +17,7 @@ import DownloadModal from './components/landing/DownloadModal';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('guide'); // Start on Guide for judges to see evaluation rubric immediately!
+  const [activeTab, setActiveTab] = useState('briefing'); // Immediate live executive output!
   const [metrics, setMetrics] = useState(null);
   const [stats, setStats] = useState(null);
   const [briefing, setBriefing] = useState(null);
@@ -99,7 +99,7 @@ export default function App() {
       {/* Background ambient lighting */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(139,92,246,0.12),rgba(0,0,0,0))] pointer-events-none -z-10" />
 
-      {/* Top Header with live Nebius Telemetry & Hackathon badge */}
+      {/* Top Header with live Nebius Telemetry */}
       <Header
         metrics={metrics}
         stats={stats}
@@ -139,16 +139,7 @@ export default function App() {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="w-full"
             >
-              {/* 1. Step-by-Step Guide & Official Rubric */}
-              {activeTab === 'guide' && (
-                <GuideView
-                  onSelectTab={(tab) => setActiveTab(tab)}
-                  onOpenCapture={() => setIsCaptureOpen(true)}
-                  onOpenDownload={() => handleOpenDownload('mac')}
-                />
-              )}
-
-              {/* 2. Executive Briefing */}
+              {/* 1. Executive Briefing (Default Output) */}
               {activeTab === 'briefing' && (
                 <BriefingView
                   briefing={briefing}
@@ -157,7 +148,7 @@ export default function App() {
                 />
               )}
 
-              {/* 3. Goal Planner Engine */}
+              {/* 2. Goal Planner Engine */}
               {activeTab === 'goals' && (
                 <GoalPlannerView
                   onGoalCreated={() => {
@@ -168,28 +159,37 @@ export default function App() {
                 />
               )}
 
-              {/* 4. Grounded Copilot Chat */}
+              {/* 3. Grounded Copilot Chat */}
               {activeTab === 'chat' && (
                 <CopilotChat
                   onUpdateMetrics={(newMetrics) => setMetrics(newMetrics)}
                 />
               )}
 
-              {/* 5. Live H100 Hardware Benchmark */}
+              {/* 4. Live H100 Hardware Speedometer Benchmark */}
               {activeTab === 'benchmark' && (
                 <BenchmarkView
                   onUpdateMetrics={(newMetrics) => setMetrics(newMetrics)}
                 />
               )}
 
-              {/* 6. Context Diff Inspector */}
+              {/* 5. Context Diff Inspector */}
               {activeTab === 'diff' && (
                 <ContextDiffView />
               )}
 
-              {/* 7. Memory & Local Watcher */}
+              {/* 6. Memory & Local Watcher */}
               {activeTab === 'memory' && (
                 <MemoryInspector stats={stats} />
+              )}
+
+              {/* 7. Interactive Product Tour */}
+              {activeTab === 'guide' && (
+                <GuideView
+                  onSelectTab={(tab) => setActiveTab(tab)}
+                  onOpenCapture={() => setIsCaptureOpen(true)}
+                  onOpenDownload={() => handleOpenDownload('mac')}
+                />
               )}
             </motion.div>
           </AnimatePresence>
