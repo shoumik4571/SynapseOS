@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
-import { Target, Compass, MessageSquare, Gauge, ArrowLeftRight, Database } from 'lucide-react';
+import { Award, Target, Compass, MessageSquare, Gauge, ArrowLeftRight, Database } from 'lucide-react';
 
 const TABS = [
+  { id: 'guide', label: '🏆 Hackathon Guide & Rubric', icon: Award },
   { id: 'briefing', label: 'Executive Briefing', icon: Target },
   { id: 'goals', label: 'Goal Engine', icon: Compass },
   { id: 'chat', label: 'Thought Partner', icon: MessageSquare },
