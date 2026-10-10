@@ -1,13 +1,11 @@
-# SynapseOS — Hackathon Architecture & Priorities
+# Q4 Product Strategy & Client Architecture Notes
 
-## High-Leverage Goals
-- Deliver the Personal AI ambient copilot for the Nebius x NVIDIA Hackathon 2026.
-- Benchmark Nebius Token Factory throughput with `nvidia/Nemotron-3_5-Lightning`.
-- Implement local-first NeMo privacy guardrails to protect user API keys and PII.
-- Build clean Next.js HUD with live tokens/sec speedometer gauge.
+## High-Leverage Initiatives
+- Finalize enterprise deployment rollout for customer review meeting.
+- Confirm client privacy firewall and zero-data retention guidelines.
+- Prepare agenda for design review meeting with team at 11:30 AM.
+- Review pull request #142 for token streamer buffer latency.
 
-## Current Architecture Notes
-- Backend: FastAPI async server with SSE streaming.
-- Model: Serving Nemotron over Nebius Token Factory.
-- Memory: SQLite hybrid store with ambient file watching and semantic recency scoring.
-- Privacy boundary: Zero credentials ever sent to cloud.
+## Key Decisions
+- Approved architecture migration to high-throughput cloud clusters.
+- On-device credential sanitization active across all workstations.

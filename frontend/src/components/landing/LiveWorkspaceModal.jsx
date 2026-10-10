@@ -74,6 +74,21 @@ export default function LiveWorkspaceModal({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
+  // Close modal when pressing Escape or when clicking hash anchors
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    const handleHash = () => onClose?.();
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('hashchange', handleHash);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('hashchange', handleHash);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
