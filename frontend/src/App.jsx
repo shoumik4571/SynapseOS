@@ -1,200 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
-import BriefingView from './components/BriefingView';
-import ContextDiffView from './components/ContextDiffView';
-import CopilotChat from './components/CopilotChat';
-import MemoryInspector from './components/MemoryInspector';
-import QuickCaptureModal from './components/QuickCaptureModal';
-import GoalPlannerView from './components/GoalPlannerView';
-import SettingsModal from './components/SettingsModal';
-import AmbientDrawer from './components/AmbientDrawer';
-import MacDockNav from './components/MacDockNav';
-import StudioMarquee from './components/StudioMarquee';
-import StudioHero from './components/StudioHero';
-import BenchmarkView from './components/BenchmarkView';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Target, MessageSquare, ArrowLeftRight, Database, Compass, Gauge } from 'lucide-react';
+import React, { useState } from 'react';
+import Navbar from './components/landing/Navbar';
+import HeroSection from './components/landing/HeroSection';
+import ProductMockup from './components/landing/ProductMockup';
+import FeaturesGrid from './components/landing/FeaturesGrid';
+import ProFeatureTrial from './components/landing/ProFeatureTrial';
+import HowItWorks from './components/landing/HowItWorks';
+import UseCasesInteractive from './components/landing/UseCasesInteractive';
+import CompatibilitySection from './components/landing/CompatibilitySection';
+import TestimonialsSection from './components/landing/TestimonialsSection';
+import FAQSection from './components/landing/FAQSection';
+import ContactSection from './components/landing/ContactSection';
+import FinalCTA from './components/landing/FinalCTA';
+import Footer from './components/landing/Footer';
+import DownloadModal from './components/landing/DownloadModal';
+import LiveWorkspaceModal from './components/landing/LiveWorkspaceModal';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('briefing');
-  const [metrics, setMetrics] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [briefing, setBriefing] = useState(null);
-  const [loadingBriefing, setLoadingBriefing] = useState(false);
-  const [isCaptureOpen, setIsCaptureOpen] = useState(false);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('nebius_api_key') || '');
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
+  const [downloadPlatform, setDownloadPlatform] = useState('mac');
+  const [liveWorkspaceOpen, setLiveWorkspaceOpen] = useState(false);
 
-  // Keyboard shortcut for Cmd+K
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsCaptureOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const res = await fetch('/api/stats');
-      const data = await res.json();
-      setStats(data);
-    } catch (err) {
-      console.error(err);
-    }
+  const handleOpenDownload = (platform = 'mac') => {
+    setDownloadPlatform(platform);
+    setDownloadModalOpen(true);
   };
-
-  const fetchBriefing = async () => {
-    setLoadingBriefing(true);
-    try {
-      const res = await fetch('/api/briefing/latest');
-      const data = await res.json();
-      setBriefing(data);
-      if (data.metrics?.tokens_per_second) {
-        setMetrics(data.metrics);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingBriefing(false);
-    }
-  };
-
-  const regenerateBriefing = async () => {
-    setLoadingBriefing(true);
-    try {
-      const res = await fetch('/api/briefing/generate', { method: 'POST' });
-      const data = await res.json();
-      setBriefing(data);
-      if (data.metrics?.tokens_per_second) {
-        setMetrics(data.metrics);
-      }
-      fetchStats();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingBriefing(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchStats();
-    fetchBriefing();
-  }, []);
 
   return (
-    <div className="relative min-h-screen bg-black text-neutral-100 flex flex-col font-sans overflow-x-hidden selection:bg-white selection:text-black">
-      {/* Top Header with live Nebius Telemetry */}
-      <Header
-        metrics={metrics}
-        stats={stats}
-        onOpenCapture={() => setIsCaptureOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        isDemoMode={isDemoMode}
+    <div className="relative min-h-screen bg-[#09090B] text-neutral-100 font-sans selection:bg-violet-500 selection:text-white overflow-x-hidden">
+      {/* Background radial gradient mesh */}
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] pointer-events-none -z-10" />
+
+      {/* Navigation */}
+      <Navbar
+        onOpenDownload={() => handleOpenDownload('mac')}
+        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* Studio-Inspired Infinite Discipline Marquee */}
-      <StudioMarquee />
-
-      {/* Main Container */}
-      <main className="flex-1 flex flex-col p-6 max-w-6xl w-full mx-auto space-y-8">
-        {/* Studio-Inspired Editorial Hero & Stats Matrix */}
-        <StudioHero
-          metrics={metrics}
-          onExploreTab={(tab) => setActiveTab(tab)}
-        />
-
-        {/* Authentic macOS Dock Navigation */}
-        <MacDockNav
-          activeTab={activeTab}
-          onSelectTab={setActiveTab}
-          isDemoMode={isDemoMode}
-        />
-
-        {/* Tab Content with Fluid Motion Transitions */}
-        <div className="flex-1">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10, scale: 0.995 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.995 }}
-              transition={{ duration: 0.16, ease: "easeOut" }}
-              className="w-full"
-            >
-              {activeTab === 'briefing' && (
-                <BriefingView
-                  briefing={briefing}
-                  onRegenerate={regenerateBriefing}
-                  loading={loadingBriefing}
-                />
-              )}
-
-              {activeTab === 'goals' && (
-                <GoalPlannerView
-                  onGoalCreated={() => {
-                    fetchBriefing();
-                    fetchStats();
-                  }}
-                  onUpdateMetrics={(m) => setMetrics(m)}
-                />
-              )}
-
-              {activeTab === 'chat' && (
-                <CopilotChat
-                  onUpdateMetrics={(newMetrics) => setMetrics(newMetrics)}
-                />
-              )}
-
-              {activeTab === 'benchmark' && (
-                <BenchmarkView
-                  onUpdateMetrics={(newMetrics) => setMetrics(newMetrics)}
-                />
-              )}
-
-              {activeTab === 'diff' && (
-                <ContextDiffView />
-              )}
-
-              {activeTab === 'memory' && (
-                <MemoryInspector stats={stats} />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </main>
-
-      {/* Quick Capture Modal (Cmd+K) */}
-      <QuickCaptureModal
-        isOpen={isCaptureOpen}
-        onClose={() => setIsCaptureOpen(false)}
-        onCaptured={() => {
-          fetchStats();
-        }}
+      {/* Hero Section */}
+      <HeroSection
+        onOpenDownload={handleOpenDownload}
+        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* Settings & BYOK Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        apiKey={apiKey}
-        onSaveKey={(newKey) => {
-          setApiKey(newKey);
-          localStorage.setItem('nebius_api_key', newKey);
-        }}
-        isDemoMode={isDemoMode}
-        onToggleDemo={(val) => setIsDemoMode(val)}
+      {/* Product Showcase Mockup */}
+      <ProductMockup />
+
+      {/* Core Features Grid */}
+      <FeaturesGrid />
+
+      {/* Winning Pro Feature Trial */}
+      <ProFeatureTrial
+        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
       />
 
-      {/* Ambient Slide-In Edge HUD (Hover or Cmd+Shift+S) */}
-      <AmbientDrawer
-        briefing={briefing}
-        metrics={metrics}
-        onCapture={fetchStats}
+      {/* How It Works Sequential Workflow */}
+      <HowItWorks />
+
+      {/* Interactive Persona Use Cases */}
+      <UseCasesInteractive />
+
+      {/* Native Compatibility & Specs */}
+      <CompatibilitySection
+        onOpenDownload={handleOpenDownload}
+      />
+
+      {/* Authentic Testimonials */}
+      <TestimonialsSection />
+
+      {/* Collapsible FAQ Accordion */}
+      <FAQSection />
+
+      {/* Contact & Feedback */}
+      <ContactSection />
+
+      {/* Final Call to Action */}
+      <FinalCTA
+        onOpenDownload={handleOpenDownload}
+        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
+      />
+
+      {/* Comprehensive Footer */}
+      <Footer
+        onOpenDownload={handleOpenDownload}
+        onOpenLiveDemo={() => setLiveWorkspaceOpen(true)}
+      />
+
+      {/* Direct Download Modal (macOS DMG & Windows EXE) */}
+      <DownloadModal
+        isOpen={downloadModalOpen}
+        onClose={() => setDownloadModalOpen(false)}
+        defaultPlatform={downloadPlatform}
+      />
+
+      {/* Full In-Browser Live Workspace Modal for Judges / Instant Trial */}
+      <LiveWorkspaceModal
+        isOpen={liveWorkspaceOpen}
+        onClose={() => setLiveWorkspaceOpen(false)}
       />
     </div>
   );
