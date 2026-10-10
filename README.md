@@ -1,4 +1,4 @@
-# SynapseOS 🧠⚡
+# Synapse 🧠⚡
 
 > **Ambient Cognitive Copilot & Contextual Second Brain**  
 > *Built for the **Nebius x NVIDIA Global AI Hackathon 2026** — Track: **Personal AI***
@@ -23,7 +23,7 @@
 
 Most personal AI assistants today are **passive chat bots**: they wait dormant until prompted, possess no awareness of your active workspace, and cause cognitive friction as you constantly re-explain context.
 
-**SynapseOS** is an **ambient, proactive personal AI copilot** that maintains your flow state by bridging workspace context, thoughts, and high-speed reasoning:
+**Synapse** is an **ambient, proactive personal AI copilot** that maintains your flow state by bridging workspace context, thoughts, and high-speed reasoning:
 
 - **Ambient Context Ingestion**: Silently indexes active workspace files, markdown notes, code diffs, and quick captures.
 - **Ultra-Fast Streaming via Nebius Token Factory**: Powers continuous reasoning with `nvidia/Nemotron-3_5-Lightning` on Nebius H100 infrastructure at hundreds of tokens per second.
@@ -38,14 +38,14 @@ Most personal AI assistants today are **passive chat bots**: they wait dormant u
 
 ```mermaid
 flowchart TD
-    subgraph Client ["SynapseOS Frontend (React / Tailwind)"]
+    subgraph Client ["Synapse Frontend (React / Tailwind)"]
         UI["Web Dashboard & Ambient HUD"]
         CmdK["Quick Capture Modal (Cmd+K)"]
         SpeedMeter["Live Token Factory Speedometer"]
         EdgeHUD["Screen Edge Slide-Out HUD (Cmd+Shift+S)"]
     end
 
-    subgraph Backend ["SynapseOS Backend (FastAPI)"]
+    subgraph Backend ["Synapse Backend (FastAPI)"]
         Watcher["Ambient Workspace Watcher"]
         Guardrails["NVIDIA NeMo Privacy Scrubber"]
         MemoryStore["Hybrid Context Store (SQLite + Vector)"]
@@ -76,7 +76,7 @@ flowchart TD
 ## 🚀 Key Features
 
 1. **Executive Morning Briefing & Session Kickoff**: Synthesizes what you were working on yesterday, unresolved threads, and high-leverage priorities for today.
-2. **Context Switch Diff**: When switching between projects or tasks, SynapseOS computes a 3-bullet recap of where you left off.
+2. **Context Switch Diff**: When switching between projects or tasks, Synapse computes a 3-bullet recap of where you left off.
 3. **Ambient Memory Graph**: Inspect your contextual second brain in real-time.
 4. **Local-First Privacy**: NeMo Guardrail pipeline sanitizes API keys and PII on your local machine before cloud transmission.
 5. **Real-Time Token Throughput Gauge**: Showcases Nebius Token Factory's inference speed (tokens/sec, TTFT) right inside the UI.

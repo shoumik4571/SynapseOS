@@ -71,7 +71,7 @@ export default function BenchmarkView({ onUpdateMetrics }) {
             <Sparkles className="w-4 h-4 text-white" />
           </h1>
           <p className="text-xs text-neutral-400 max-w-2xl leading-relaxed">
-            Live hardware telemetry demonstrating why SynapseOS delivers zero ambient friction:
+            Live hardware telemetry demonstrating why Synapse delivers zero ambient friction:
             sustained <strong className="text-white">165+ tokens/sec</strong> on dedicated NVIDIA H100 clusters vs traditional cloud bottlenecks.
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function BenchmarkView({ onUpdateMetrics }) {
             <span>Privacy Guardrail & Zero-Retention</span>
           </div>
           <p className="text-xs text-neutral-400 leading-relaxed">
-            SynapseOS pairs client-side NeMo semantic token scrubbing (zero credential exposure) 
+            Synapse pairs client-side NeMo semantic token scrubbing (zero credential exposure) 
             with Nebius enterprise zero-retention cloud inference, matching on-device privacy 
             with 4.8x the throughput of an M3 laptop.
           </p>

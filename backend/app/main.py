@@ -1,5 +1,5 @@
 """
-SynapseOS Backend API Server.
+Synapse Backend API Server.
 FastAPI entrypoint with streaming endpoints, ambient context management,
 and Nebius Token Factory inference telemetry.
 """
@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
     ambient_watcher.stop()
 
 app = FastAPI(
-    title="SynapseOS API",
+    title="Synapse API",
     description="Ambient Cognitive Copilot & Contextual Second Brain (Nebius x NVIDIA Hackathon 2026)",
     version="1.0.0",
     lifespan=lifespan
@@ -77,7 +77,7 @@ class VerifyKeyRequest(BaseModel):
 async def health_check():
     return {
         "status": "healthy",
-        "app": "SynapseOS",
+        "app": "Synapse",
         "nebius_model": settings.nebius_model,
         "nebius_base_url": settings.nebius_base_url,
         "demo_mode": settings.demo_mode or not settings.nebius_api_key,

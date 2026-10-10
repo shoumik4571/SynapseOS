@@ -11,10 +11,10 @@ export default function FormFactorsSection({ onOpenDownload, onOpenExtension }) 
           FLEXIBLE ARCHITECTURE
         </div>
         <h2 className="text-3xl sm:text-5xl font-display font-extrabold text-white tracking-tight">
-          Two Ways to Experience SynapseOS
+          Two Ways to Experience Synapse
         </h2>
         <p className="mt-4 text-base sm:text-lg text-zinc-400 leading-relaxed">
-          Because web browsers sandbox what an app can see, SynapseOS gives you full control: run the complete native application for whole-system automation, or use the lightweight browser extension.
+          Because web browsers sandbox what an app can see, Synapse gives you full control: run the complete native application for whole-system automation, or use the lightweight browser extension.
         </p>
       </div>
 
@@ -50,7 +50,7 @@ export default function FormFactorsSection({ onOpenDownload, onOpenExtension }) 
               </li>
               <li className="flex items-start gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                <span><strong>Global Hotkey (Cmd+K / Ctrl+K):</strong> Summon SynapseOS anywhere, even with no browser open.</span>
+                <span><strong>Global Hotkey (Cmd+K / Ctrl+K):</strong> Summon Synapse anywhere, even with no browser open.</span>
               </li>
               <li className="flex items-start gap-2.5">
                 <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />

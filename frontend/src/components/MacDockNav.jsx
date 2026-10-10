@@ -1,15 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
-import { Target, Compass, MessageSquare, Gauge, ArrowLeftRight, Database, Award } from 'lucide-react';
+import { Sun, MessageSquare, Compass, Gauge, Award } from 'lucide-react';
 
 const TABS = [
-  { id: 'briefing', label: 'Executive Briefing', icon: Target },
-  { id: 'goals', label: 'Goal Engine', icon: Compass },
-  { id: 'chat', label: 'Thought Partner', icon: MessageSquare },
-  { id: 'benchmark', label: 'H100 Speedometer', icon: Gauge },
-  { id: 'diff', label: 'Context Diff', icon: ArrowLeftRight },
-  { id: 'memory', label: 'Memory & Watcher', icon: Database },
-  { id: 'guide', label: 'Interactive Tour', icon: Award },
+  { id: 'briefing', label: 'Morning Plan', icon: Sun },
+  { id: 'chat', label: 'AI Copilot', icon: MessageSquare },
+  { id: 'goals', label: 'Goal Planner', icon: Compass },
+  { id: 'benchmark', label: 'Speed Test', icon: Gauge },
+  { id: 'guide', label: "Judges' Tour", icon: Award },
 ];
 
 function DockItem({ mouseX, tab, isActive, onClick }) {

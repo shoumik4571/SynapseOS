@@ -8,7 +8,7 @@ export default function CopilotChat({ onUpdateMetrics }) {
     {
       id: 1,
       role: 'assistant',
-      content: 'I am SynapseOS, your personal cognitive copilot. Grounded in your active workspace files with real-time Tavily Web Search and powered by NVIDIA Nemotron-3.5-Lightning on Nebius Token Factory. What are we building or problem-solving right now?',
+      content: 'I am Synapse, your personal AI copilot. Grounded with real-time Tavily Web Search and powered by NVIDIA Nemotron-3.5-Lightning on Nebius Token Factory. What are we building or problem-solving right now?',
       metrics: null,
       reasoning: null,
       guardrailAlert: null,

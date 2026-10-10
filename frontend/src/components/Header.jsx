@@ -20,10 +20,10 @@ export default function Header({ metrics, stats, onOpenCapture, onOpenSettings, 
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-sm font-bold tracking-tight text-white flex items-center gap-1.5 font-display">
-              Synapse<span className="text-violet-400">OS</span>
+              Synapse
             </h1>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-900 text-violet-300 border border-violet-500/30 font-semibold">
-              Hackathon 2026
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/30 font-semibold">
+              Personal AI
             </span>
           </div>
           <p className="text-[11px] text-neutral-400 font-mono hidden sm:block">
@@ -38,7 +38,7 @@ export default function Header({ metrics, stats, onOpenCapture, onOpenSettings, 
         className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/40 border border-violet-500/30 hover:border-violet-400 text-violet-300 text-xs font-mono transition-colors"
       >
         <Award className="w-3.5 h-3.5 text-amber-400" />
-        <span>Judges Evaluation Guide</span>
+        <span>Judges' Tour</span>
       </button>
 
       {/* Clean Telemetry & Action Buttons */}

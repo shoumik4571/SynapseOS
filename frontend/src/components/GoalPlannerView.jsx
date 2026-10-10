@@ -87,7 +87,7 @@ export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
         </div>
         <h2 className="text-xl font-bold text-white tracking-tight">Define Your North Star Goal</h2>
         <p className="text-xs text-neutral-400 max-w-2xl leading-relaxed">
-          Tell SynapseOS what you want to achieve. NVIDIA Nemotron breaks it down into strategic phases,
+          Tell Synapse what you want to achieve. NVIDIA Nemotron breaks it down into strategic phases,
           derives today's tactical tasks, and syncs directly with your morning briefing.
         </p>
 

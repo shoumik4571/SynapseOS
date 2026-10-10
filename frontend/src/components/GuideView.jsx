@@ -34,7 +34,7 @@ export default function GuideView({ onSelectTab, onOpenCapture, onOpenDownload }
       badge: 'Feature 1 of 5',
       color: 'text-violet-400',
       description:
-        'SynapseOS synthesizes what you worked on, open loops, and high-leverage priorities before you even start your workday. Click below to experience the live briefing output.',
+        'Synapse synthesizes what you worked on, open loops, and high-leverage priorities before you even start your workday. Click below to experience the live briefing output.',
       actionLabel: 'View Executive Briefing Output',
       onAction: () => onSelectTab('briefing'),
       details: [
@@ -51,7 +51,7 @@ export default function GuideView({ onSelectTab, onOpenCapture, onOpenDownload }
       badge: 'Feature 2 of 5',
       color: 'text-purple-400',
       description:
-        'Type any ambitious goal (e.g. "Prepare product launch" or "Redesign architecture"). SynapseOS instantly outputs a 3-phase strategic roadmap, time estimates, and today\'s tactical checklist.',
+        'Type any ambitious goal (e.g. "Prepare product launch" or "Redesign architecture"). Synapse instantly outputs a 3-phase strategic roadmap, time estimates, and today\'s tactical checklist.',
       actionLabel: 'Test Goal Engine Output',
       onAction: () => onSelectTab('goals'),
       details: [
@@ -68,7 +68,7 @@ export default function GuideView({ onSelectTab, onOpenCapture, onOpenDownload }
       badge: 'Feature 3 of 5',
       color: 'text-cyan-400',
       description:
-        'Ask questions, draft emails, and research technical questions. SynapseOS streams answers at 165+ tok/s while verifying factual citations via Tavily live web search.',
+        'Ask questions, draft emails, and research technical questions. Synapse streams answers at 165+ tok/s while verifying factual citations via Tavily live web search.',
       actionLabel: 'Chat with Grounded Copilot',
       onAction: () => onSelectTab('chat'),
       details: [
@@ -87,8 +87,8 @@ export default function GuideView({ onSelectTab, onOpenCapture, onOpenDownload }
       description:
         'Watch privacy in action. Try typing any sensitive credential below—NeMo Guardrails strips it locally on your computer before anything is sent.',
       sandbox: true,
-      actionLabel: 'Inspect Privacy Memory Logs',
-      onAction: () => onSelectTab('memory'),
+      actionLabel: 'Test in Copilot Chat',
+      onAction: () => onSelectTab('chat'),
       details: [
         'On-device regex and Colang 2.0 pattern matching',
         'Zero API keys, passwords, or personal emails sent to cloud',
@@ -134,7 +134,7 @@ export default function GuideView({ onSelectTab, onOpenCapture, onOpenDownload }
             <span className="text-xs text-neutral-400">Step-by-step walkthrough</span>
           </div>
           <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
-            How SynapseOS Works
+            How Synapse Works
           </h2>
           <p className="text-xs text-neutral-400 max-w-2xl leading-relaxed">
             Explore the core outputs below. Each tab in the dock demonstrates a working output of our ambient desktop AI companion.
