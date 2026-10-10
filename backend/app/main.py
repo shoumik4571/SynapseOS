@@ -124,8 +124,7 @@ async def generate_briefing():
 async def get_latest_briefing():
     latest = memory_store.get_latest_briefing()
     if not latest:
-        # Generate on the fly if none exists
-        return await briefing_agent.generate_briefing()
+        return None
     return latest
 
 @app.post("/api/schedule/structure")

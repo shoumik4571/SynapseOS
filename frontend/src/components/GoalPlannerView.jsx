@@ -97,7 +97,7 @@ export default function GoalPlannerView({ onGoalCreated, onUpdateMetrics }) {
               type="text"
               value={goalText}
               onChange={(e) => setGoalText(e.target.value)}
-              placeholder="e.g. Win Nebius x NVIDIA Hackathon with video demo and polish by Oct 30..."
+              placeholder="e.g. Launch AI SaaS in 30 days, Master machine learning fundamentals, Redesign application..."
               className="flex-1 bg-black border border-neutral-800 focus:border-neutral-500 rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-500 focus:outline-none transition-all shadow-inner"
             />
             <div className="flex gap-2">

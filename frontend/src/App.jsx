@@ -28,6 +28,7 @@ import GuideView from './components/GuideView';
 import QuickCaptureModal from './components/QuickCaptureModal';
 import SettingsModal from './components/SettingsModal';
 import FormFactorsSection from './components/landing/FormFactorsSection';
+import HowToUseVisualGuide from './components/landing/HowToUseVisualGuide';
 import SimpleDownloadSection from './components/landing/SimpleDownloadSection';
 import SimpleFAQ from './components/landing/SimpleFAQ';
 import SimpleFooter from './components/landing/SimpleFooter';
@@ -232,7 +233,10 @@ export default function App() {
         </div>
       </main>
 
-      {/* 4. Form Factors Section (Explains Web Workspace vs Desktop & Extension) */}
+      {/* 4. Visual How-To-Use Guide & 3-Minute Demo Video */}
+      <HowToUseVisualGuide />
+
+      {/* 5. Form Factors Section (Explains Web Workspace vs Desktop & Extension) */}
       <FormFactorsSection
         onOpenDownload={handleOpenDownload}
         onOpenExtension={() => handleOpenDownload('ext')}
